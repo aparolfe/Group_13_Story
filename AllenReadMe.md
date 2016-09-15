@@ -1,3 +1,3 @@
 # Group_13_Story
-Hello, this is Allen!
+Hello, this is Allen!!
 EC544 Story!
