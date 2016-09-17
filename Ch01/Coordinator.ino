@@ -18,12 +18,7 @@ void loop() {
 // Serial.println(Serial.available());
   if(Serial.available()>0)
   {
-    //int x = Serial.read();
-    //Serial.println("========xxxxx=========");
-    //Serial.println(x);
-    //Serial.println("========yyyyy=========");
-    //delay(1000);
-    //delay(1000);
+
     Serial.readBytes( mode,5);
     
    // Serial.write(temp_2);
