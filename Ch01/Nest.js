@@ -10,7 +10,32 @@ portConfig = {
 	baudRate: 9600,
 	parser: SerialPort.parsers.readline("\n")
 };
-
+function getDateTime() {
+    var curt     = new Date();
+    var year    = curt.getFullYear();
+    var month   = curt.getMonth()+1;
+    var day     = curt.getDate();
+    var hour    = curt.getHours();
+    var minute  = curt.getMinutes();
+    var second  = curt.getSeconds();
+    if(month.toString().length == 1) {
+        var month = '0'+month;
+    }
+    if(day.toString().length == 1) {
+        var day = '0'+day;
+    }
+    if(hour.toString().length == 1) {
+        var hour = '0'+hour;
+    }
+    if(minute.toString().length == 1) {
+        var minute = '0'+minute;
+    }
+    if(second.toString().length == 1) {
+        var second = '0'+second;
+    }
+    var time = hour+':'+minute+':'+second;
+     return time;
+}
 var printAverage = function(inputArray ){
     var tempDict = {};
     for (var ii = 0; ii < inputArray.length; ii++) {
@@ -24,7 +49,7 @@ var printAverage = function(inputArray ){
 	sum = sum + parseFloat(tempDict[key]);
     });
     var displayTemp = sum/(Object.keys(tempDict).length);
-    io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
+    io.emit("chat message", "Average Temperature at " + getDateTime() + " : " + displayTemp.toFixed(2) + "\xB0C" + "Sensor 1 :" );
     dataArray=[];
 };
 
@@ -57,4 +82,3 @@ sp.on("open", function () {
       dataArray.push(data);
   });
 });
-
