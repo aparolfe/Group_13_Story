@@ -24,7 +24,8 @@ var printAverage = function(inputArray ){
 	sum = sum + parseFloat(tempDict[key]);
     });
     var displayTemp = sum/(Object.keys(tempDict).length);
-    io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
+    //io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
+    io.emit("chat message",{message: "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C", temp: tempDict})
     dataArray=[];
 };
 
