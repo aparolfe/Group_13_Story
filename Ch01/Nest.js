@@ -51,7 +51,7 @@ var printAverage = function(inputArray ){
     });
     var displayTemp = sum/(Object.keys(tempDict).length);
     //io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
-    io.emit("chat message",{message: "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C", temp: tempDict})
+    io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + displayTemp.toFixed(2) + "\xB0 C", temp: tempDict})
     dataArray=[];
 };
 
