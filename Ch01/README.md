@@ -39,9 +39,9 @@ Then identify the XBee device and it's port and run the command
 ```
 node Nest.js <Device>
 
-you should be able to see the output on [http://localhost:3000](http://localhost:3000)
 ```
 
+you should be able to see the output on [http://localhost:3000](http://localhost:3000)
 ## Contributors
 
 1. Aparna Rolfe
