@@ -1,0 +1,19 @@
+{
+  "name": "ch01",
+  "version": "1.0.0",
+  "description": "collecting and displaying data on the localhost",
+  "main": "Nest.js",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "dateformat": "^1.0.12",
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8",
+    "serialport": "^4.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aparna, Prerana, Yan (Allan)",
+  "license": "ISC"
+}
