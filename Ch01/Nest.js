@@ -2,10 +2,6 @@ var SerialPort = require("serialport");
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('test.db');
-var math = require('mathjs');
-
 
 var dataArray = [];
 
@@ -41,40 +37,19 @@ function getDateTime() {
      return time;
 }
 var printAverage = function(inputArray ){
-
     var tempDict = {};
     for (var ii = 0; ii < inputArray.length; ii++) {
 	var data = inputArray[ii];
 	var value = data.substring(data.length-6, data.length)
 	var id = data.substring(0, data.length-6)
 	tempDict[id] = value;
-	inputArray[ii] = value;
     };
-    console.log(tempDict)
+    dataArray=[];
     var sum = 0;
     Object.keys(tempDict).forEach(function(key) {
 	sum = sum + parseFloat(tempDict[key]);
     });
-    
- 
     var displayTemp = sum/(Object.keys(tempDict).length);
-    try{ 
-	    //insert into db
-	    var max = math.max.apply(null,inputArray);
-	    var min = math.min.apply(null,inputArray);
-	    console.log(displayTemp,max,min);
-	    db.serialize(function(){
-	
-	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)"); //}
-		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?)");
-		stmt.run(getDateTime(), displayTemp, max, min);
-		stmt.finalize();
-		});
-    }catch(e){
-	console.log("An error has occured",e)
-    }
-    
-    //db.close();
     //io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
     io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + displayTemp.toFixed(2) + "\xB0 C", temp: tempDict})
     dataArray=[];
