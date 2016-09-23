@@ -6,14 +6,13 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('test.db');
 var math = require('mathjs');
 
-
 var dataArray = [];
-
 var portName = process.argv[2],
 portConfig = {
 	baudRate: 9600,
 	parser: SerialPort.parsers.readline("\n")
 };
+
 function getDateTime() {
     var curt     = new Date();
     var year    = curt.getFullYear();
@@ -40,8 +39,9 @@ function getDateTime() {
     var time = hour+':'+minute+':'+second;
      return time;
 }
-var printAverage = function(inputArray ){
 
+function printAverage(inputArray ) {
+    // Calculate average, high, low
     var tempDict = {};
     for (var ii = 0; ii < inputArray.length; ii++) {
 	var data = inputArray[ii];
@@ -51,32 +51,33 @@ var printAverage = function(inputArray ){
 	inputArray[ii] = value;
     };
     console.log(tempDict)
+    var max = 0;
+    var min = 100;
     var sum = 0;
     Object.keys(tempDict).forEach(function(key) {
-	sum = sum + parseFloat(tempDict[key]);
-    });
+	var temp = parseFloat(tempDict[key]);
+	sum = sum + temp;
+	if (temp>max) {max = temp};
+	if (temp<min) {min = temp};
+    });    
+    var avg = sum/(Object.keys(tempDict).length);
     
- 
-    var displayTemp = sum/(Object.keys(tempDict).length);
+    // send data to update display
+    //io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + avg.toFixed(2) + "\xB0 C", temp: tempDict});
+    io.emit("data", {high:max, current:avg, low:min});
+    //insert into db    
     try{ 
-	    //insert into db
-	    var max = math.max.apply(null,inputArray);
-	    var min = math.min.apply(null,inputArray);
-	    console.log(displayTemp,max,min);
+	    console.log(avg,max,min);
 	    db.serialize(function(){
 	
-	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)"); //}
+	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)");
 		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?)");
-		stmt.run(getDateTime(), displayTemp, max, min);
+		stmt.run(getDateTime(), avg, max, min);
 		stmt.finalize();
 		});
     }catch(e){
-	console.log("An error has occured",e)
+	console.log("An error has occurred",e);
     }
-    
-    //db.close();
-    //io.emit("chat message", "Average Temperature: " + displayTemp.toFixed(2) + "\xB0 C");
-    io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + displayTemp.toFixed(2) + "\xB0 C", temp: tempDict})
     dataArray=[];
 };
 

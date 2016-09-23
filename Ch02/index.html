@@ -16,6 +16,16 @@
     </style>
   </head>
   <body>
+<div style="height:80px; width:150px; background-color:silver; margin:auto; margin-top:10px; border-radius:5px; padding-top:10px; text-align:center;">
+  Current Temperature
+  <br>
+<div id="currtemp" style="height:60px; width:130px; margin:auto; font-size:xx-large; margin-top:10px;">
+  20.00 C
+  </div>
+  </div>
+<div style="width: 90%; margin:auto">
+  <canvas id="myChart" width="200" height="100"></canvas>
+</div>
     <div>
 	<h1><p id="date"></p></h1>
 	<br>
@@ -29,32 +39,110 @@
     	  <input id="m" autocomplete="off" /><button>Send</button>
     	</form-->
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-<script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
+    <script>
   var socket = io();
-</script>
-<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-  var socket = io();
-  $('form').submit(function(){
-    socket.emit('chat message', $('#m').val());
-    $('#m').val('');
-    return false;
-  });
-  socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg.message));
-    $('#temperature').text(msg.message);
-    document.getElementById("date").innerHTML = Date();
-    var obj = msg.temp;
-    var heading = '';
-    var content = '';
-    $.each(obj,function(key,value){
-	heading += '<th> Sensor number:  '+key+'</th>';
-	content += '<td>'+value+'</td>';
-	});
-    $('#temps').html("<tr>"+heading+'</tr>' + '<tr>'+content+'</tr>')
-    console.log(msg.temp);
+var means =  [];
+var highs=[];
+var lows = [];
+var xlabels = [];
+var labelcount =0;
+    var ctx = document.getElementById("myChart");
+    console.log("in temp script");
+var data = {
+    labels: xlabels,
+    datasets: [
+        {
+            label: "High",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(255,192,192,1)",
+            borderColor: "rgba(255,127,127,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(255,127,127,1)",
+            pointBackgroundColor: "rgba(255,127,127,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(255,127,127,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: highs,
+            spanGaps: false,
+        } ,       {
+            label: "Average Temperature",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(192,192,192,0.4)",
+            borderColor: "rgba(0,0,0,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(0,0,0,1)",
+            pointBackgroundColor: "rgba(0,0,0,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(0,0,0,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: means,
+            spanGaps: false,
+        } ,       {
+            label: "Low",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(192,192,255,0.4)",
+            borderColor: "rgba(127,127,255,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(127,127,255,1)",
+            pointBackgroundColor: "rgba(127,127,255,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(127,127,255,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: lows,
+            spanGaps: false,
+        }
+    ]
+};
+
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        title: {
+            display: true,
+            text: 'Temperature History'
+        },
+        scales: {
+            xAxes: [{
+                display: false
+            }]
+        }
+    }
+});
+    socket.on('data', function(msg){    
+    myLineChart.data.datasets[1].data.push(msg.current);
+    myLineChart.data.datasets[0].data.push(msg.high);
+    myLineChart.data.datasets[2].data.push(msg.low);
+    myLineChart.data.labels.push(labelcount++);
+    myLineChart.update();
+    document.getElementById("currtemp").innerHTML = msg.current.toFixed(2) + " \xB0C";
   });
 </script>
   </body>
