@@ -63,14 +63,15 @@ function printAverage(inputArray ) {
     
     // send data to update display
     //io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + avg.toFixed(2) + "\xB0 C", temp: tempDict});
-    io.emit("data", {high:max, current:avg, low:min});
+    io.emit("data", {time: Date(), high:max, current:avg, low:min});
     //insert into db    
     try{ 
 	    db.serialize(function(){
 	
 	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)");
+		console.log("insert into db")
 		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?)");
-		stmt.run(getDateTime(), avg, max, min);
+		stmt.run(Date(), avg, max, min);
 		stmt.finalize();
 		});
     }catch(e){
@@ -85,6 +86,24 @@ sp = new SerialPort.SerialPort(portName, portConfig);
 app.get('/', function(req, res){
   res.sendfile('index.html');
 });
+
+
+app.get('/query', function(req,res){
+	var datetime = [];
+        var avgtemp = [];
+        var hightemp = [];
+        var lowtemp = [];
+	db.all("SELECT * FROM temp", function(err,rows){
+		rows.forEach(function(row){
+			datetime.push(row.datetime);
+			avgtemp.push(row.avgtemp);	
+			hightemp.push(row.hightemp);
+			lowtemp.push(row.lowtemp);
+		});
+		res.json({time: datetime,avg:avgtemp,high:hightemp,low:lowtemp});
+	});
+});
+
 
 io.on('connection', function(socket){
   console.log('a user connected');
