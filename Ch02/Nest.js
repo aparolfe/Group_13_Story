@@ -88,6 +88,13 @@ app.get('/', function(req, res){
   res.sendfile('index.html');
 });
 
+
+app.get('/query', function(req,res){
+	db.all("SELECT * FROM temp", function(err,row){
+		res.json(row);
+	});
+});
+
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('disconnect', function(){
