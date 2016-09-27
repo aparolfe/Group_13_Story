@@ -50,7 +50,6 @@ function printAverage(inputArray ) {
 	tempDict[id] = value;
 	inputArray[ii] = value;
     };
-    console.log(tempDict)
     var max = 0;
     var min = 100;
     var sum = 0;
@@ -67,7 +66,6 @@ function printAverage(inputArray ) {
     io.emit("data", {high:max, current:avg, low:min});
     //insert into db    
     try{ 
-	    console.log(avg,max,min);
 	    db.serialize(function(){
 	
 	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)");
@@ -107,6 +105,9 @@ sp.on("open", function () {
     setInterval(function(){printAverage(dataArray);}, 2000);
   sp.on('data', function(data) {
       console.log('data received: ' + data);
-      dataArray.push(data);
+      // sanitize data
+      if (data.substring(data.length-4,data.length-3) == ".") {
+	  dataArray.push(data);
+      }
   });
 });
