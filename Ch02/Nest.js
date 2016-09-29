@@ -89,7 +89,7 @@ sp.on("open", function () {
   sp.on('data', function(data) {
       console.log('data received: ' + data);
       // sanitize input data
-      if (data.substring(data.length-4,data.length-3) == ".") {
+      if (data.length==7 && data.substring(data.length-4,data.length-3) == ".") {
 	  dataArray.push(data);
       }
   });
