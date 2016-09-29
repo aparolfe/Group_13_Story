@@ -7,6 +7,7 @@ var db = new sqlite3.Database('test.db');
 var math = require('mathjs');
 
 var dataArray = [];
+var updateDisplayFlag = false;
 var portName = process.argv[2],
 portConfig = {
 	baudRate: 9600,
@@ -15,118 +16,112 @@ portConfig = {
 
 function getDateTime() {
     var curt     = new Date();
-    var year    = curt.getFullYear();
-    var month   = curt.getMonth()+1;
-    var day     = curt.getDate();
     var hour    = curt.getHours();
     var minute  = curt.getMinutes();
     var second  = curt.getSeconds();
-    if(month.toString().length == 1) {
-        var month = '0'+month;
-    }
-    if(day.toString().length == 1) {
-        var day = '0'+day;
-    }
-    if(hour.toString().length == 1) {
+    if (hour.toString().length == 1) {
         var hour = '0'+hour;
     }
-    if(minute.toString().length == 1) {
+    if (minute.toString().length == 1) {
         var minute = '0'+minute;
     }
-    if(second.toString().length == 1) {
+    if (second.toString().length == 1) {
         var second = '0'+second;
     }
     var time = hour+':'+minute+':'+second;
      return time;
 }
 
-function printAverage(inputArray ) {
+function tempAverage(inputArray ) {
     // Calculate average, high, low
-    var tempDict = {};
-    for (var ii = 0; ii < inputArray.length; ii++) {
-	var data = inputArray[ii];
-	var value = data.substring(data.length-6, data.length)
-	var id = data.substring(0, data.length-6)
-	tempDict[id] = value;
-	inputArray[ii] = value;
-    };
-    var max = 0;
-    var min = 100;
-    var sum = 0;
-    Object.keys(tempDict).forEach(function(key) {
-	var temp = parseFloat(tempDict[key]);
-	sum = sum + temp;
-	if (temp>max) {max = temp};
-	if (temp<min) {min = temp};
-    });    
-    var avg = sum/(Object.keys(tempDict).length);
-    
-    // send data to update display
-    //io.emit("chat message",{message: "Average Temperature at " + getDateTime() +":" + avg.toFixed(2) + "\xB0 C", temp: tempDict});
-    io.emit("data", {time: Date(), high:max, current:avg, low:min});
-    //insert into db    
-    try{ 
-	    db.serialize(function(){
-	
+    if (dataArray.length > 0) {
+	var tempDict = {};
+	for (var ii = 0; ii < inputArray.length; ii++) {
+	    var data = inputArray[ii];
+	    var value = data.substring(data.length-6, data.length)
+	    var id = data.substring(0, data.length-6)
+	    tempDict[id] = value;
+	    inputArray[ii] = value;
+	};
+	var max = 0;
+	var min = 100;
+	var sum = 0;
+	Object.keys(tempDict).forEach(function(key) {
+	    var temp = parseFloat(tempDict[key]);
+	    sum = sum + temp;
+	    if (temp>max) {max = temp};
+	    if (temp<min) {min = temp};
+	});    
+	var avg = sum/(Object.keys(tempDict).length);
+	// send data to update display
+	if (updateDisplayFlag) {
+	    io.emit("data", {time:getDateTime(), high:max, current:avg, low:min});
+	}
+	//insert into db    
+	try{ 
+	    db.serialize(function(){		
 	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)");
 		console.log("insert into db")
 		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?)");
 		stmt.run(Date(), avg, max, min);
 		stmt.finalize();
 		});
-    }catch(e){
-	console.log("An error has occurred",e);
+	} catch(e) {
+	    console.log("An error has occurred",e);
+	}
+	dataArray=[];
     }
-    dataArray=[];
-};
-
-var sp;
-sp = new SerialPort.SerialPort(portName, portConfig);
-
-app.get('/', function(req, res){
-  res.sendfile('index.html');
-});
-
-
-app.get('/query', function(req,res){
-	var datetime = [];
-        var avgtemp = [];
-        var hightemp = [];
-        var lowtemp = [];
-	db.all("SELECT * FROM temp", function(err,rows){
-		rows.forEach(function(row){
-			datetime.push(row.datetime);
-			avgtemp.push(row.avgtemp);	
-			hightemp.push(row.hightemp);
-			lowtemp.push(row.lowtemp);
-		});
-		res.json({time: datetime,avg:avgtemp,high:hightemp,low:lowtemp});
-	});
-});
-
+};	
 
 io.on('connection', function(socket){
   console.log('a user connected');
-  socket.on('disconnect', function(){
-  });
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-    sp.write(msg + "\n");
-  });
 });
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
 
+var sp;
+sp = new SerialPort.SerialPort(portName, portConfig);
 sp.on("open", function () {
     console.log('open');
-    setInterval(function(){printAverage(dataArray);}, 2000);
+    setInterval(function(){tempAverage(dataArray);}, 2000);
   sp.on('data', function(data) {
       console.log('data received: ' + data);
-      // sanitize data
+      // sanitize input data
       if (data.substring(data.length-4,data.length-3) == ".") {
 	  dataArray.push(data);
       }
   });
 });
+
+// default page with current temperature and session graph
+app.get('/', function(req, res){
+    updateDisplayFlag = true;
+    res.sendFile('index.html' , { root : __dirname});
+});
+
+// historical view page
+app.get('/history', function(req,res){
+    updateDisplayFlag = false;
+    res.sendFile('history.html' , { root : __dirname});
+    setTimeout(function(){
+	var datetime = [];
+        var avgtemp = [];
+        var hightemp = [];
+        var lowtemp = [];
+	db.all("SELECT * FROM temp", function(err,rows){
+	    rows.forEach(function(row){
+		datetime.push(row.datetime.substring(0,row.datetime.length-15));
+		avgtemp.push(row.avgtemp);	
+		hightemp.push(row.hightemp);
+		lowtemp.push(row.lowtemp);
+	    });
+	    io.emit("data", {time:datetime, high:hightemp, current:avgtemp, low:lowtemp});
+	    console.log("sent db data");
+	});
+    },500); 
+});
+
+
+

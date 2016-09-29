@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Realtime Temperature display</title>
+    <title>Historical Temperature Display</title>
     <style type="text/css">
       .header {
       height:60px;
@@ -33,14 +33,7 @@
 </style>
   </head>
   <body>
-    <div class="header"> EC544 Group 13 Nest Website <div id="historical" class="button">Historical view</div></div>
-<div style="height:80px; width:150px; background-color:silver; margin:auto; margin-top:10px; border-radius:5px; padding-top:10px; text-align:center;">
-  Current Temperature
-  <br>
-<div id="currtemp" style="height:60px; width:130px; margin:auto; font-size:xx-large; margin-top:10px;">
-  Loading...
-  </div>
-  </div>
+    <div class="header"> EC544 Group 13 Nest Website <div id="realtime" class="button">Current status</div></div>
 <div style="width: 90%; margin:auto">
   <canvas id="myChart" width="200" height="100"></canvas>
 </div>
@@ -48,15 +41,14 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script>
-      $(historical).click(function(){
-      window.location.href = 'history';
+      $(realtime).click(function(){
+      window.location.href = '../';
     });
 var socket = io();
 var means =  [];
 var highs=[];
 var lows = [];
 var xlabels = [];
-var labelcount =0;
     var ctx = document.getElementById("myChart");
 var data = {
     labels: xlabels,
@@ -134,30 +126,28 @@ var myLineChart = new Chart(ctx, {
     options: {
         title: {
             display: true,
-            fontSize: 24,
+	    fontSize: 24,
 	    fontFamily: "Georgia,serif",
-            text: 'Current Session Graph'
+            text: 'Historical Data'
         },
         scales: {
             xAxes: [{
-                display: true
+               display: true
             }],
            yAxes: [{ ticks: {
                     callback: function(value, index, values) {
                         return value.toFixed(2) + '\xB0C';
                     } } }]
-
         }
     }
 });
 socket.on('data', function(msg){
     console.log("got data");
-    myLineChart.data.datasets[1].data.push(msg.current);
-    myLineChart.data.datasets[0].data.push(msg.high);
-    myLineChart.data.datasets[2].data.push(msg.low);
-    myLineChart.data.labels.push(msg.time);
+    myLineChart.data.datasets[1].data = myLineChart.data.datasets[1].data.concat(msg.current);
+    myLineChart.data.datasets[0].data = myLineChart.data.datasets[0].data.concat(msg.high);
+    myLineChart.data.datasets[2].data = myLineChart.data.datasets[2].data.concat(msg.low);
+    myLineChart.data.labels = myLineChart.data.labels.concat(msg.time);
     myLineChart.update();
-    document.getElementById("currtemp").innerHTML = msg.current.toFixed(2) + " \xB0C";
   });
 </script>
   </body>
