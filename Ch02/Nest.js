@@ -120,7 +120,7 @@ app.get('/history', function(req,res){
 	    io.emit("data", {time:datetime, high:hightemp, current:avgtemp, low:lowtemp});
 	    console.log("sent db data");
 	});
-    },500); 
+    },2000); 
 });
 
 
