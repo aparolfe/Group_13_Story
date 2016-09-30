@@ -39,8 +39,11 @@
   <br>
 <div id="currtemp" style="height:60px; width:130px; margin:auto; font-size:xx-large; margin-top:10px;">
   Loading...
-  </div>
-  </div>
+</div>
+</div>
+<div id="sensors" style="margin:auto; font-size:large; margin-top:10px; text-align:center; color:seagreen;" >
+  0 sensors currently reporting
+</div>
 <div style="width: 90%; margin:auto">
   <canvas id="myChart" width="200" height="100"></canvas>
 </div>
@@ -49,6 +52,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script>
       $(historical).click(function(){
+      io.close();
       window.location.href = 'history';
     });
 var socket = io();
@@ -158,6 +162,8 @@ socket.on('data', function(msg){
     myLineChart.data.labels.push(msg.time);
     myLineChart.update();
     document.getElementById("currtemp").innerHTML = msg.current.toFixed(2) + " \xB0C";
+    document.getElementById("sensors").innerHTML = msg.sensorcount + " sensors currently reporting";
+
   });
 </script>
   </body>
