@@ -52,18 +52,19 @@ function tempAverage(inputArray ) {
 	    if (temp>max) {max = temp};
 	    if (temp<min) {min = temp};
 	});    
-	var avg = sum/(Object.keys(tempDict).length);
+	var count = Object.keys(tempDict).length;
+	var avg = sum/count;
 	// send data to update display
 	if (updateDisplayFlag) {
-	    io.emit("data", {time:getDateTime(), high:max, current:avg, low:min});
+	    io.emit("data", {time:getDateTime(), high:max, current:avg, low:min, sensorcount:count});
 	}
 	//insert into db    
 	try{ 
 	    db.serialize(function(){		
-	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL)");
+	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL, count INTEGER)");
 		console.log("insert into db")
-		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?)");
-		stmt.run(Date(), avg, max, min);
+		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?,?)");
+		stmt.run(Date(), avg, max, min,count);
 		stmt.finalize();
 		});
 	} catch(e) {
@@ -120,7 +121,7 @@ app.get('/history', function(req,res){
 	    io.emit("data", {time:datetime, high:hightemp, current:avgtemp, low:lowtemp});
 	    console.log("sent db data");
 	});
-    },500); 
+    },2000); 
 });
 
 
