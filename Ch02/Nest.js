@@ -61,9 +61,9 @@ function tempAverage(inputArray ) {
 	//insert into db    
 	try{ 
 	    db.serialize(function(){		
-	    	db.run("CREATE TABLE IF NOT EXISTS temp (datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL, count INTEGER)");
+	    	db.run("CREATE TABLE IF NOT EXISTS temp (id INTEGER PRIMARY KEY AUTOINCREMENT, datetime TEXT, avgtemp REAL, hightemp REAL, lowtemp REAL, count INTEGER)");
 		console.log("insert into db")
-		var stmt = db.prepare("INSERT INTO temp VALUES(?,?,?,?,?)");
+		var stmt = db.prepare("INSERT INTO temp VALUES(datetime,avgtemp,hightemp,lowtemp,count)");
 		stmt.run(Date(), avg, max, min,count);
 		stmt.finalize();
 		});
