@@ -1,0 +1,27 @@
+
+void setup() {
+  Serial.begin(9600);
+ pinMode(13, OUTPUT);
+}
+
+void loop() {
+
+   Serial.println("inside");
+  //if(Serial.available() >0)
+//{
+  if (Serial.read() == '0')
+  {
+    digitalWrite(13, LOW);
+    Serial.println("the value is 0");
+  }
+ 
+ else if (Serial.read() == '1')
+ {
+   digitalWrite(13, HIGH);
+    Serial.println("the value is 1");
+  }
+ //}
+
+  delay (2000);
+ }
+  
