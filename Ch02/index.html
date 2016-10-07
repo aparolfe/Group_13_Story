@@ -37,7 +37,7 @@
 <div style="height:80px; width:150px; background-color:silver; margin:auto; margin-top:10px; border-radius:5px; padding-top:10px; text-align:center;">
   Current Temperature
   <br>
-<div id="currtemp" style="height:60px; width:130px; margin:auto; font-size:xx-large; margin-top:10px;">
+<div id="currtemp" style="height:60px; width:130px; margin:auto; font-size:x-large; margin-top:10px;">
   Loading...
 </div>
 </div>
@@ -52,6 +52,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script>
       $(historical).click(function(){
+	socket.close();
       window.location.href = 'history';
     });
 var socket = io();
