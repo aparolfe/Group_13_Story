@@ -23,21 +23,70 @@ void loop() {
 
 if( Serial.available()>0)
 {
-  char Value_Reading = Serial.read();
-  switch (Value_Reading ) {
-     case 'C':   
-     digitalWrite(13, LOW);
-     Serial.println("the value is 0");
+
+    String first  = Serial.readStringUntil(',');
+    int LED_Nu = first.toInt();
+    //Serial.read(); //next character is comma, so skip it using this
+    int second = Serial.readStringUntil('.').toInt();
+    Serial.println(LED_Nu);
+    Serial.println(second);
+  switch (LED_Nu) {
+    
+     case 5:   
+      if (second == 0)
+       {digitalWrite(5, LOW);
+       Serial.println("the value is 0 of port 5");
+       break;
+       }else if (second ==1)
+       digitalWrite(5, HIGH);
+       Serial.println("the value is 1 of port 5");
      break;
       
-    case 'O': 
-    digitalWrite(13, HIGH);
-    Serial.println("the value is 1");
-    break;
+    case  6: 
+     if (second == 0)
+       {digitalWrite(6, LOW);
+       Serial.println("the value is 0 of port 6");
+       break;}
+       
+       else if (second ==1)
+       digitalWrite(6, HIGH);
+       Serial.println("the value is 1 of port 6");
+       break;
+    
+    case  7: 
+        if (second == 0)
+       {digitalWrite(7, LOW);
+       Serial.println("the value is 0 of port 7");
+       break;
+       }else if (second ==1)
+       digitalWrite(7, HIGH);
+       Serial.println("the value is 1 of port 7");
+       break;
+    
+    case  8: 
+        if (second == 0)
+       {digitalWrite(8, LOW);
+       Serial.println("the value is 0 of port 8");
+       break;}
+       else if (second ==1)
+       digitalWrite(8, HIGH);
+       Serial.println("the value is 1 of port 8");
+       break;
+
+     case  13: 
+        if (second == 0)
+       {digitalWrite(13, LOW);
+       Serial.println("the value is 0 of port 13");
+       break;}
+       else if (second ==1)
+       digitalWrite(13, HIGH);
+       Serial.println("the value is 1 of port 13");
+       break;
   }
   delay(1000); 
 }       
 }
+
 
 
 
