@@ -41,10 +41,10 @@
     <table>
     	<tr>
     		<th>Arduino 1</th>
-     		<th><input type="button" class="bton" id="1" value="OFF"></input></th>
-		<th><input type="button" class="bton" id="2" value="OFF"></input></th>
-		<th><input type="button" class="bton" id="3" value="OFF"></input></th>
-		<th><input type="button" class="bton" id="4" value="OFF"></input></th>
+     		<th><input type="button" class="bton" id=1 value="OFF"></input></th>
+		<th><input type="button" class="bton" id=2 value="OFF"></input></th>
+		<th><input type="button" class="bton" id=3 value="OFF"></input></th>
+		<th><input type="button" class="bton" id=4 value="OFF"></input></th>
     	</tr>
     </table>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -53,18 +53,32 @@
     <script>
       $('.bton').click(function(){
 	var value  = $(this).val();
+	var id = $(this).attr("id");
 	if (value == "OFF"){
-		console.log(value);
 		$(this).val("ON");
-		$(this).css("background-color","green")
+		$(this).css("background-color","green");
+		postData(1,id);
 	}
 	else if (value == "ON"){
-		console.log(value);
 		$(this).val("OFF");
-		$(this).css("background-color","crimson")
+		$(this).css("background-color","crimson");
+		postData(0,id);
 	}
 		
     });
+
+	function postData(value,id){
+		console.log(value,id);
+		//POST the data to the url /update
+		$.ajax({
+		  type: "POST",
+		  url: '/update',
+		  data: JSON.stringify({id:value}), //format of the data beign sent
+		  success: console.log("Success"),
+		  error: console.log("Error"),
+		  dataType: 'application/json'
+		});	
+	}
     </script>
 </body>
 </html>
