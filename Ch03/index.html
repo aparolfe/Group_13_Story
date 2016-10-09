@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Realtime Temperature display</title>
+    <style type="text/css">
+	table {
+	    border-collapse: collapse;
+	    margin-left: 10px;
+	}
+	
+	table, td, th {
+	    border: 1px solid black;
+	}
+      .header {
+      height:60px;
+      background:gray;
+      width:100%;
+      padding:5px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 36px;
+      text-align:center;
+      margin: -5px;
+      margin-bottom: 10px;
+      }
+      input[type=button] {
+      float:right;
+      border-radius: 17px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 20px;
+      background: crimson;
+      padding: 10px 20px 10px 20px;
+      margin:10px;
+      text-decoration: none;
+      }
+</style>
+  </head>
+  <body>
+    <div class="header"> EC544 Group 13 LED status website </div>
+    <table>
+    	<tr>
+    		<th>Arduino 1</th>
+     		<th><input type="button" class="bton" id="1" value="OFF"></input></th>
+		<th><input type="button" class="bton" id="2" value="OFF"></input></th>
+		<th><input type="button" class="bton" id="3" value="OFF"></input></th>
+		<th><input type="button" class="bton" id="4" value="OFF"></input></th>
+    	</tr>
+    </table>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
+    <script>
+      $('.bton').click(function(){
+	var value  = $(this).val();
+	if (value == "OFF"){
+		console.log(value);
+		$(this).val("ON");
+		$(this).css("background-color","green")
+	}
+	else if (value == "ON"){
+		console.log(value);
+		$(this).val("OFF");
+		$(this).css("background-color","crimson")
+	}
+		
+    });
+    </script>
+</body>
+</html>
+
