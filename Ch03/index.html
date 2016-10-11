@@ -45,6 +45,7 @@
 		<th><input type="button" class="bton" id=2 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=3 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=4 value="OFF"></input></th>
+		<th><div id="date"></div></th>
     	</tr>
     </table>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -73,12 +74,32 @@
 		$.ajax({
 		  type: "POST",
 		  url: '/update',
-		  data: JSON.stringify({id:value}), //format of the data beign sent
+		  data: id+','+value+'.', //format of the data beign sent
 		  success: console.log("Success"),
 		  error: console.log("Error"),
 		  dataType: 'application/json'
 		});	
 	}
+	
+	  var socket = io();
+	//recieve data status
+   	  socket.on('data', function(msg){
+	    console.log("got LED status",msg);
+  	    document.getElementById("date").innerHTML = Date();
+	    var data = msg.status;
+	    for (var i=0; i < data.length; i++) {
+		if(data.charAt(i) == '0'){
+		$(i).value("OFF");
+	 	$(i).css("background-color","crimson");
+		}
+		else if(data.charAt(i) == '1'){
+		$(i).value("ON");
+		$(i).css("background-color","green");
+		}
+		 }
+  	    //$.each(obj,function(key,value){
+  	    //    });
+  	  });
     </script>
 </body>
 </html>
