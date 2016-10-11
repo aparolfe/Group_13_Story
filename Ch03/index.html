@@ -46,6 +46,7 @@
 		<th><input type="button" class="bton" id=3 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=4 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=5 value="OFF"></input></th>
+		<th><input type="button" id="party" value="OFF"></input></th>
 		<th><div id="date"></div></th>
     	</tr>
     </table>
@@ -65,6 +66,27 @@
 		$(this).val("OFF");
 		$(this).css("background-color","crimson");
 		postData(0,id);
+	}
+		
+    });
+      $("#party").click(function(){
+	var value  = $(this).val();
+	var id = $(this).attr("id");
+	if (value == "OFF"){
+		$(this).val("ON");
+		$(this).css("background-color","blue");
+		$.ajax({
+		  type: "GET",
+		  url: '/blink'
+		});	
+	}
+	else if (value == "ON"){
+		$(this).val("OFF");
+		$(this).css("background-color","crimson");
+		$.ajax({
+		  type: "GET",
+		  url: '/stop'
+		});	
 	}
 		
     });
