@@ -32,19 +32,6 @@ var led = 0;
 sp = new SerialPort.SerialPort(portName, portConfig);
 sp.on("open", function () {
     console.log('Serial port open');
-    /*setInterval(function(){
-
-    	    sp.write('5,0.');
-
-
-    }, 2000);
-    setInterval(function(){
-
-    	    sp.write('5,1.');
-
-
-    }, 2000);*/
-
  /*   setTimeout(function(){
 	sp.write('5,1.');
 	sp.write('6,1.');
@@ -55,23 +42,21 @@ sp.on("open", function () {
     setInterval(function(){
 	if (led == 0) {
 	    sp.write('5,0.');
+	    sp.write('6,0.');
+	    sp.write('7,0.');
+      sp.write('8,0.');
+	    sp.write('13,0.');
 	    led = 1;
 	}
 	else {
-	    sp.write('5,1.');
+    sp.write('5,1.');
+    sp.write('6,1.');
+    sp.write('7,1.');
+    sp.write('8,1.');
+    sp.write('13,1.');
 	    led = 0;
 	}
-}, 2000);
-/*setInterval(function(){
-if (led == 0) {
-  sp.write('5,0.');
-  led = 1;
-}
-else {
-  sp.write('5,1.');
-  led = 0;
-}
-}, 2000);*/
+	}, 2000);
   sp.on('data', function(data) {
       // sanitize input data
       if (data.length==7) {
