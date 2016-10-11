@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Realtime Temperature display</title>
+    <title>LED Control Home</title>
     <style type="text/css">
 	table {
 	    border-collapse: collapse;
@@ -45,6 +45,7 @@
 		<th><input type="button" class="bton" id=2 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=3 value="OFF"></input></th>
 		<th><input type="button" class="bton" id=4 value="OFF"></input></th>
+		<th><input type="button" class="bton" id=5 value="OFF"></input></th>
 		<th><div id="date"></div></th>
     	</tr>
     </table>
@@ -70,14 +71,13 @@
 
 	function postData(value,id){
 		console.log(value,id);
-		//POST the data to the url /update
+		//send the data to the url /update
 		$.ajax({
-		  type: "POST",
+		  type: "GET",
 		  url: '/update',
-		  data: id+','+value+'.', //format of the data beign sent
+		  data: id+','+value+'.', //format of the data being sent   JSON.stringify({13:1})
 		  success: console.log("Success"),
-		  error: console.log("Error"),
-		  dataType: 'application/json'
+		  dataType: 'text'
 		});	
 	}
 	
@@ -87,18 +87,17 @@
 	    console.log("got LED status",msg);
   	    document.getElementById("date").innerHTML = Date();
 	    var data = msg.status;
-	    for (var i=0; i < data.length; i++) {
+    for (var i=0; i < data.length-2; i++) {
+                var id = '#' + (i+1).toString();
 		if(data.charAt(i) == '0'){
-		$(i).value("OFF");
-	 	$(i).css("background-color","crimson");
+		$(id).val("OFF");
+	 	$(id).css("background-color","crimson");
 		}
 		else if(data.charAt(i) == '1'){
-		$(i).value("ON");
-		$(i).css("background-color","green");
+		$(id).val("ON");
+		$(id).css("background-color","green");
 		}
 		 }
-  	    //$.each(obj,function(key,value){
-  	    //    });
   	  });
     </script>
 </body>
