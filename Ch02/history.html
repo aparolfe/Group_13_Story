@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Historical Temperature Display</title>
+    <style type="text/css">
+      .header {
+      height:60px;
+      background:gray;
+      width:100%;
+      padding:5px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 36px;
+      text-align:center;
+      margin: -5px;
+      }
+      .button {
+      float:right;
+      border-radius: 17px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 20px;
+      background: coral;
+      padding: 10px 20px 10px 20px;
+      margin:10px;
+      text-decoration: none;
+      }
+      .button:hover {
+      background: crimson;
+      cursor:pointer;
+      text-decoration: none;
+      }
+</style>
+  </head>
+  <body>
+    <div class="header"> EC544 Group 13 Nest Website <div id="realtime" class="button">Current status</div></div>
+<div style="width: 90%; margin:auto">
+  <canvas id="myChart" width="200" height="100"></canvas>
+</div>
+     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
+    <script>
+      $(realtime).click(function(){
+      window.location.href = '../';
+    });
+var socket = io();
+var means =  [];
+var highs=[];
+var lows = [];
+var xlabels = [];
+    var ctx = document.getElementById("myChart");
+var data = {
+    labels: xlabels,
+    datasets: [
+        {
+            label: "High",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(255,192,192,1)",
+            borderColor: "rgba(255,127,127,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(255,127,127,1)",
+            pointBackgroundColor: "rgba(255,127,127,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(255,127,127,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: highs,
+            spanGaps: false,
+        } ,       {
+            label: "Average Temperature",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(192,192,192,0.4)",
+            borderColor: "rgba(0,0,0,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(0,0,0,1)",
+            pointBackgroundColor: "rgba(0,0,0,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(0,0,0,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: means,
+            spanGaps: false,
+        } ,       {
+            label: "Low",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "rgba(192,192,255,0.4)",
+            borderColor: "rgba(127,127,255,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(127,127,255,1)",
+            pointBackgroundColor: "rgba(127,127,255,1)",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(127,127,255,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: lows,
+            spanGaps: false,
+        }
+    ]
+};
+
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        title: {
+            display: true,
+	    fontSize: 24,
+	    fontFamily: "Georgia,serif",
+            text: 'Historical Data'
+        },
+        scales: {
+            xAxes: [{
+               display: true
+            }],
+           yAxes: [{ ticks: {
+                    callback: function(value, index, values) {
+                        return value.toFixed(2) + '\xB0C';
+                    } } }]
+        }
+    }
+});
+socket.on('data', function(msg){
+    console.log("got data");
+    myLineChart.data.datasets[1].data = myLineChart.data.datasets[1].data.concat(msg.current);
+    myLineChart.data.datasets[0].data = myLineChart.data.datasets[0].data.concat(msg.high);
+    myLineChart.data.datasets[2].data = myLineChart.data.datasets[2].data.concat(msg.low);
+    myLineChart.data.labels = myLineChart.data.labels.concat(msg.time);
+    myLineChart.update();
+  });
+</script>
+  </body>
+</html>
