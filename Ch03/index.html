@@ -7,7 +7,7 @@
 	    border-collapse: collapse;
 	    margin-left: 10px;
 	}
-	
+
 	table, td, th {
 	    border: 1px solid black;
 	}
@@ -67,16 +67,16 @@
 		$(this).css("background-color","blue");
 		$(this).prop("disabled",true);
 		postData(1,id);
-		check[id] = value;
+		check[id] = "1";
 	}
 	else if (value == "ON"){
 		$(this).val("OFF");
 		$(this).css("background-color","blue");
 		$(this).prop("disbaled",true);
 		postData(0,id);
-		check[id] = value;
+		check[id] = "0";
 	}
-		
+
     });
 
 	function postData(value,id){
@@ -88,9 +88,9 @@
 		  data: id+','+value+'.', //format of the data being sent   JSON.stringify({13:1})
 		  success: console.log("Success"),
 		  dataType: 'text'
-		});	
+		});
 	}
-	
+
 	  var socket = io();
 	//recieve data status
    	  socket.on('data', function(msg){
@@ -99,7 +99,22 @@
 	    var data = msg.status;
     	    for (var i=0; i < data.length-2; i++) {
                 var id = '#' + (i+1).toString();
-		checkButtonDisable((i+1).toString(),id,data.charAt(i));	
+                if((i+1).toString() in check){
+                  //checkButtonDisable((i+1).toString(),id,data.charAt(i));
+                  if (check[(i+1).toString()] == data.charAt(i)){
+                    console.log(check);
+                    $(id).prop("disabled",false);
+                    delete check[(i+1).toString()];
+                    changebutton(data,id,i);
+                    console.log(check);
+                  }
+                }
+                else{
+                  changebutton(data,id,i);
+                }
+              }
+      });
+    function changebutton(data,id,i){
 		if(data.charAt(i) == '0'){
 		$(id).val("OFF");
 	 	$(id).css("background-color","crimson");
@@ -109,17 +124,15 @@
 		$(id).css("background-color","green");
 		}
 		 }
-  	  });
-	
+
+
 	  function checkButtonDisable(id,cssid,value){
-		if(id in check){
 			if(check[id] == value){
-				$(cssid).prop("disabled",false);	
+				$(cssid).prop("disabled",false);
 				delete check[id];
-			}
+        console.log(cssid,check);
 		}
 		}
     </script>
 </body>
 </html>
-
