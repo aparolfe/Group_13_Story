@@ -18,17 +18,21 @@
       padding:5px;
       font-family: Georgia;
       color: #ffffff;
-      font-size: 36px;
+      font-size: 200%;
       text-align:center;
       margin: -5px;
       margin-bottom: 10px;
       }
+      input[type=text] {
+	text-align: center;
+	}
       input[type=button] {
       float:right;
+      width: 70px;
       border-radius: 17px;
       font-family: Georgia;
       color: #ffffff;
-      font-size: 20px;
+      font-size: 100%;
       background: crimson;
       padding: 10px 20px 10px 20px;
       margin:10px;
@@ -53,18 +57,24 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script>
+      var check = {};
       $('.bton').click(function(){
 	var value  = $(this).val();
 	var id = $(this).attr("id");
+	console.log(typeof(id));
 	if (value == "OFF"){
 		$(this).val("ON");
-		$(this).css("background-color","green");
+		$(this).css("background-color","blue");
+		$(this).prop("disabled",true);
 		postData(1,id);
+		check[id] = value;
 	}
 	else if (value == "ON"){
 		$(this).val("OFF");
-		$(this).css("background-color","crimson");
+		$(this).css("background-color","blue");
+		$(this).prop("disbaled",true);
 		postData(0,id);
+		check[id] = value;
 	}
 		
     });
@@ -87,8 +97,9 @@
 	    console.log("got LED status",msg);
   	    document.getElementById("date").innerHTML = Date();
 	    var data = msg.status;
-    for (var i=0; i < data.length-2; i++) {
+    	    for (var i=0; i < data.length-2; i++) {
                 var id = '#' + (i+1).toString();
+		checkButtonDisable((i+1).toString(),id,data.charAt(i));	
 		if(data.charAt(i) == '0'){
 		$(id).val("OFF");
 	 	$(id).css("background-color","crimson");
@@ -99,6 +110,15 @@
 		}
 		 }
   	  });
+	
+	  function checkButtonDisable(id,cssid,value){
+		if(id in check){
+			if(check[id] == value){
+				$(cssid).prop("disabled",false);	
+				delete check[id];
+			}
+		}
+		}
     </script>
 </body>
 </html>
