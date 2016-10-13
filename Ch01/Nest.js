@@ -10,7 +10,6 @@ portConfig = {
 	baudRate: 9600,
 	parser: SerialPort.parsers.readline("\n")
 };
-//get date time
 function getDateTime() {
     var curt     = new Date();
     var year    = curt.getFullYear();
