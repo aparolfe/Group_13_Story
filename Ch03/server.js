@@ -68,3 +68,31 @@ app.get('/update', function(req, res){
     sp.write(cmd); 
     //don't send anything back to website
 });
+
+var special;
+app.get('/blink', function(req, res){
+    //start randomly changing LED status
+    var led = 0;
+    special = setInterval(function(){
+	if (led == 0) {
+	    sp.write('1,0.');
+	    sp.write('2,0.');
+	    sp.write('3,0.');
+	    sp.write('4,0.');
+	    sp.write('5,0.');
+	    led = 1;
+	}
+	else {
+	    sp.write('1,1.');
+	    sp.write('2,1.');
+	    sp.write('3,1.');
+	    sp.write('4,1.');
+	    sp.write('5,1.');
+	    led = 0;
+	}
+}, 2000);
+});
+app.get('/stop', function(req, res){
+    //stop randomly changing LED status
+    clearInterval(special);
+});

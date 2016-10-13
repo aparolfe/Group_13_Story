@@ -27,8 +27,6 @@
 	text-align: center;
 	}
       input[type=button] {
-      float:right;
-      width: 70px;
       border-radius: 17px;
       font-family: Georgia;
       color: #ffffff;
@@ -38,6 +36,8 @@
       margin:10px;
       text-decoration: none;
       }
+	#party{background-color: silver; text-align: center;}
+	.party{text-align: center;}
 </style>
   </head>
   <body>
@@ -53,6 +53,7 @@
 		<th><div id="date"></div></th>
     	</tr>
     </table>
+    <div class="party"><input type="button" id="party" value="PARTY OFF"></input></div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
@@ -82,6 +83,27 @@
 		check[id] = "0";
 	}
 
+    });
+      $("#party").click(function(){
+	var value  = $(this).val();
+	var id = $(this).attr("id");
+	if (value == "PARTY OFF"){
+		$(this).val("PARTY ON");
+		$(this).css("background-color","yellow");
+		$.ajax({
+		  type: "GET",
+		  url: '/blink'
+		});	
+	}
+	else if (value == "PARTY ON"){
+		$(this).val("PARTY OFF");
+		$(this).css("background-color","silver");
+		$.ajax({
+		  type: "GET",
+		  url: '/stop'
+		});	
+	}
+		
     });
 
 	function postData(value,id){
