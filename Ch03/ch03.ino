@@ -43,7 +43,7 @@ if( Serial.available()>0)
     //Serial.println(second);
   switch (LED_Nu) {
     
-     case 5:   
+     case 1:   
       if (second == 0)
        {digitalWrite(5, LOW);
        //Serial.println("the value is 0 of port 5");
@@ -53,7 +53,7 @@ if( Serial.available()>0)
        //Serial.println("the value is 1 of port 5");
      break;
       
-    case  6: 
+    case  2: 
      if (second == 0)
        {digitalWrite(6, LOW);
        //Serial.println("the value is 0 of port 6");
@@ -64,7 +64,7 @@ if( Serial.available()>0)
        //Serial.println("the value is 1 of port 6");
        break;
     
-    case  7: 
+    case  3: 
         if (second == 0)
        {digitalWrite(7, LOW);
        //Serial.println("the value is 0 of port 7");
@@ -74,7 +74,7 @@ if( Serial.available()>0)
        //Serial.println("the value is 1 of port 7");
        break;
     
-    case  8: 
+    case  4: 
         if (second == 0)
        {digitalWrite(8, LOW);
        //Serial.println("the value is 0 of port 8");
@@ -84,7 +84,7 @@ if( Serial.available()>0)
        //Serial.println("the value is 1 of port 8");
        break;
 
-     case  13: 
+     case  5: 
         if (second == 0)
        {digitalWrite(13, LOW);
        //Serial.println("the value is 0 of port 13");
@@ -97,5 +97,5 @@ if( Serial.available()>0)
   }
    
 } 
-delay(500);      
+delay(1000);      
 }
