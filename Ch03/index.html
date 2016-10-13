@@ -76,7 +76,7 @@
 	else if (value == "ON"){
 		$(this).val("OFF");
 		$(this).css("background-color","blue");
-		$(this).prop("disbaled",true);
+		$(this).prop("disabled",true);
 		var str = id+','+0+'.';
 		socket.emit('update',str);
 		//postData(0,id);
@@ -90,18 +90,20 @@
 	if (value == "PARTY OFF"){
 		$(this).val("PARTY ON");
 		$(this).css("background-color","yellow");
-		$.ajax({
-		  type: "GET",
-		  url: '/blink'
-		});	
+		socket.emit('party','party');
+		//$.ajax({
+		//  type: "GET",
+		//  url: '/blink'
+		//});	
 	}
 	else if (value == "PARTY ON"){
 		$(this).val("PARTY OFF");
 		$(this).css("background-color","silver");
-		$.ajax({
-		  type: "GET",
-		  url: '/stop'
-		});	
+		socket.emit('party','partyoff');
+		//$.ajax({
+		//  type: "GET",
+		//  url: '/stop'
+		//});	
 	}
 		
     });

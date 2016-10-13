@@ -53,6 +53,33 @@ io.on('connection', function(socket){
 	console.log(msg);
 	sp.write(msg);
 	});
+
+  socket.on('party', function(msg){
+	console.log(msg);
+	if (msg == 'party'){
+		var led = 0;
+	        special = setInterval(function(){
+	            if (led == 0) {
+	                sp.write('1,0.');
+	                sp.write('2,0.');
+	                sp.write('3,0.');
+	                sp.write('4,0.');
+	                sp.write('5,0.');
+	                led = 1;
+	            }
+	            else {
+	                sp.write('1,1.');
+	                sp.write('2,1.');
+	                sp.write('3,1.');
+	                sp.write('4,1.');
+	                sp.write('5,1.');
+	                led = 0;
+	            }}, 2000);		
+		}
+	else if (msg == 'partyoff'){
+		clearInterval(special);
+		}
+  	});
 });
 
 // Webpage with LED status
