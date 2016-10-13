@@ -49,6 +49,10 @@ http.listen(3000, function(){
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  socket.on('update',function(msg){
+	console.log(msg);
+	sp.write(msg);
+	});
 });
 
 // Webpage with LED status
