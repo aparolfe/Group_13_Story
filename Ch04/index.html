@@ -101,7 +101,7 @@ function drawLiveChart() {
     var feeds = {};    	//dictionary wih keys = field names and values = gchart data
     var charts = {}; 	//dictionary wih keys = field names and values = gcharts
     //clear page
-    $("#sensors").html(" ");
+    $("#sensors").html("0 sensors are currently reporting.");
     $("#charts").html(" ");
     var chartCount =0;
     function stringifyDatetime(data) {	//puts datetime in format for GET request
@@ -122,13 +122,12 @@ function drawLiveChart() {
     var latest;
     $.get("https://api.thingspeak.com/channels/171727/feeds/last.json?api_key=A6QMZOBNWS0BNZAP", function(data) {
 	latest = stringifyDatetime(data);
-	var field = findDataField(data); // find which field has the data
-	newGraph(data, field); // draw graph for that field
     });
     // start update loop: find latest entry, graph all entries between latest entry and previous latest entry
     updateFunctionID = setInterval(function(){	    
 	$.get("https://api.thingspeak.com/channels/171727/feeds.json?api_key=A6QMZOBNWS0BNZAP&start="+latest, function(data) {
-	    if (Object.keys(data.feeds).length !== 1) {	// if there are new data points
+	if (Object.keys(data.feeds).length !== 1) {	// if there are new data points
+	console.log("new data received");
 		for (var entry in data.feeds) {
 		    var field = findDataField(data.feeds[entry]);
 		    if (!(field in feeds)) newGraph(data.feeds[entry],field);	// if new field, draw graph
@@ -142,7 +141,7 @@ function drawLiveChart() {
 		$("#sensors").html(message);
 	    }
 	});
-    }, 1000); 
+    }, 5000); 
 };
 
 //Data History View
