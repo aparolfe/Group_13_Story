@@ -25,10 +25,10 @@ We use a NodeJS server to render a HTML page.
 
 Live data update view
 
-![alt text]()
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/prerana/Ch04/static/liveupdates.png)
 
 Historical data view
-![alt text]()
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/prerana/Ch04/static/historicalview.png)
 
 ## Contributors
 
