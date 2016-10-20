@@ -1,0 +1,224 @@
+<html>
+  <head>
+    <title>Temperature Display</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <style>
+.header {
+    height:60px;
+    background:gray;
+    width:100%;
+    padding:5px;
+    font-family: Georgia;
+    color: #ffffff;
+    font-size: 36px;
+    text-align:center;
+    margin: -5px;
+}
+.button {
+    float:right;
+    border-radius: 17px;
+    font-family: Georgia;
+    color: #ffffff;
+    font-size: 20px;
+    background: coral;
+    padding: 10px 20px 10px 20px;
+    margin:10px;
+    text-decoration: none;
+}
+.button:hover {
+    background: crimson;
+    cursor:pointer;
+    text-decoration: none;
+}
+#sensors {
+    margin:auto;
+    font-size:large;
+    margin-top:10px;
+    text-align:center;
+    color:seagreen;
+}
+.chart {
+    display:inline-block;
+    width: 50%;
+    height: 300px;
+}
+.graph {
+    width: 100%;
+    height: 225px;
+}
+.slider {
+    width: 100%;
+    height: 50px;
+}
+    </style>
+  </head>
+  <body>
+    <div class="header"> EC544 Group 13 Photon Watch
+      <div id="view" class="button">See Data History</div>
+    </div>
+    <div id="sensors"></div>
+    <div id="charts"></div> 
+    <script>
+google.charts.load('current', {'packages':['corechart','controls']});
+google.charts.setOnLoadCallback(drawLiveChart);
+
+function findDataField(data) {
+    var field = " ";
+    for (var key in data) {
+	if (key.indexOf("field") !== -1 && data[key] !== null) field = key;
+    };
+    return field;
+};
+
+function formatDatum(data,field) {
+    var time = data["created_at"];
+    var year = time.slice(0,4);
+    var month = (parseInt(time.slice(5,7)) - 1).toString();
+    var day = time.slice(8,10);
+    var hours = time.slice(11,13);
+    var minutes = time.slice(14,16);
+    var seconds = time.slice(17,19);
+    var dateTime = new Date(Date.UTC(year,month,day,hours,minutes,seconds));
+    var value = parseFloat(data[field]);
+    return [dateTime,value];
+};
+
+    function options(field) {
+	return {
+	    'title': 'Photon '+ field.slice(5,6),
+	    'curveType': 'function',
+	    'legend': {'position': 'none'},
+	    'hAxis': {'format':'MMM dd yyyy hh:mm:ss'},
+	    'vAxis': {'format':'##.##\xB0C'}
+	}
+    };
+
+var updateFunctionID;
+
+//Live Update View
+function drawLiveChart() {
+    var feeds = {};    	//dictionary wih keys = field names and values = gchart data
+    var charts = {}; 	//dictionary wih keys = field names and values = gcharts
+    //clear page
+    $("#sensors").html("0 sensors are currently reporting.");
+    $("#charts").html(" ");
+    var chartCount =0;
+    function stringifyDatetime(data) {	//puts datetime in format for GET request
+	return (data["created_at"].replace("T", "%20")).slice(0,-1);
+    }    
+    function newGraph(data,field) {	
+	chartCount++;
+	var startData = [ ['Time', 'Temperature'] ];
+	startData.push(formatDatum(data,field));
+	var name = "chart" + field.slice(5,6);
+	$("#charts").append('<div id='+name+' class="chart"> </div>');
+	feeds[field] = google.visualization.arrayToDataTable(startData);
+	charts[field] = new google.visualization.LineChart(document.getElementById(name));
+        charts[field].draw(feeds[field], options(field));
+	return;
+    };
+    //when page is loaded, check latest entry from database
+    var latest;
+    $.get("https://api.thingspeak.com/channels/171727/feeds/last.json?api_key=A6QMZOBNWS0BNZAP", function(data) {
+	latest = stringifyDatetime(data);
+    });
+    // start update loop: find latest entry, graph all entries between latest entry and previous latest entry
+    updateFunctionID = setInterval(function(){	    
+	$.get("https://api.thingspeak.com/channels/171727/feeds.json?api_key=A6QMZOBNWS0BNZAP&start="+latest, function(data) {
+	if (Object.keys(data.feeds).length !== 1) {	// if there are new data points
+	console.log("new data received");
+		for (var entry in data.feeds) {
+		    var field = findDataField(data.feeds[entry]);
+		    if (!(field in feeds)) newGraph(data.feeds[entry],field);	// if new field, draw graph
+		    else { 										// else update chart
+			feeds[field].addRow(formatDatum(data.feeds[entry],field));
+			charts[field].draw(feeds[field], options(field));
+		    }
+		    latest = stringifyDatetime(data.feeds[entry]);
+		};
+		var message = chartCount.toString() + " sensors are currently reporting.";
+		$("#sensors").html(message);
+	    }
+	});
+    }, 5000); 
+};
+
+//Data History View
+function drawHistoryChart() {
+    //clear page
+    clearInterval(updateFunctionID);
+    $("#sensors").html(" ");
+    $("#charts").html(" ");
+    // get historical data 
+    $.get("https://api.thingspeak.com/channels/171727/feeds.json?api_key=A6QMZOBNWS0BNZAP", function(data) {
+	// iterate through json, find number of fields (number of sensors)
+	var fieldCount=0;
+	for (var key in data.channel) {
+	    if (key.indexOf("field") !== -1) {
+		fieldCount++;
+	    }
+	};
+	var feed = new Array(fieldCount);	//array to hold data for each sensor found
+	//extract data into feed array
+	for (var ii = 0; ii < fieldCount; ii++) feed[ii] = [['Time', 'Temperature']];
+	for (var entry in data.feeds) {
+	    var field = findDataField(data.feeds[entry]);
+	    feed[parseInt(field.slice(5,6))-1].push(formatDatum(data.feeds[entry],field));
+	};
+	// iterate over feed array and draw graphs
+	graphCount = 0;
+	for (var jj =0; jj< feed.length; jj++) {
+	    if (feed[jj].length !== 1) {
+		graphCount++;
+		var num =  (jj+1).toString();
+		var name = "chart" + num;
+		var sliderName = "slider" + num;
+		var graphName = "graph" + num;
+		$("#charts").append('<div id='+name+' class="chart"> <div id='+graphName+' class="graph"></div> <div id='+sliderName+' class="slider"></div> </div>');
+		var chartData = google.visualization.arrayToDataTable(feed[jj]);
+		var options = {
+		    'filterColumnLabel': 'Temperature',
+		    'title': 'Photon '+num,
+		    'curveType': 'function',
+		    'legend': {'position': 'none'},
+		    'hAxis': {'format':'MMM dd yyyy hh:mm:ss'},
+		    'vAxis': {'format':'##.##\xB0C'}
+		}; 
+		var chartDash = new google.visualization.Dashboard(document.getElementById(name));
+		var slider = new google.visualization.ControlWrapper({
+		    'controlType': 'ChartRangeFilter',
+		    'containerId': sliderName,
+		    'options': {
+			'filterColumnLabel': 'Time',
+			'hAxis': {'format':'MMM dd yyyy /n hh:mm:ss'}
+		    }
+		});
+		var graph = new google.visualization.ChartWrapper({
+		    'chartType': 'LineChart',
+		    'containerId': graphName,
+		    'options': options
+		});
+		chartDash.bind(slider,graph);
+		chartDash.draw(chartData);
+	    }
+	}
+	var message = "Historical data is available from " + graphCount.toString() + " sensors"
+	$("#sensors").html(message);
+    });
+};
+
+// Button to switch between views
+$('#view').click(function(){
+    if ($(this).html() === "See Data History") {
+	$(this).html("See Live Updates");
+	drawHistoryChart();
+    }
+    else {
+	$(this).html("See Data History");
+	drawLiveChart();
+    }
+});
+    </script>
+  </body>
+</html>
