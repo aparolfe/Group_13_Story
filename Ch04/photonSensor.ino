@@ -29,8 +29,8 @@ R = (double) PULLUP_RES / ( (4095 / (double) aval ) - 1 );
  T -= 273.15; // converting to C from K
  
  // return degrees C
- Spark.publish("Temperature", String(T) + " °C");
-
+// Spark.publish("Temperature", String(T) + " °C");
+Particle.publish("temp4", temp4, PRIVATE);
 }
 
 
