@@ -7,6 +7,8 @@
 #define    RegisterMeasure       0x00          // Register to write to initiate ranging.
 #define    MeasureValue          0x04          // Value to initiate ranging.
 #define    RegisterHighLowB      0x8f          // Register to get both High and Low bytes in 1 call.
+#define    INTERVAL     25      // (ms) Interval between distance readings.
+#define    BOUNDARY     30 // (cm) Avoid objects closer than 30cm.
 
 Servo myservo;
 Servo esc; //ESC can be controlled like a servo.
@@ -16,6 +18,7 @@ int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
 int distance = 0;                 // Distance measured
 int min_distance [100];           // keep track of the min distances this is can be modified later
+int pos_to_wall [100];           // keep track of the min distances this is can be modified later
 double maxSpeedOffset = 45; // maximum speed magnitude, in servo 'degrees'
 double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
 
@@ -39,11 +42,30 @@ double radToDeg(double radians){
   return (radians * 4068) / 71;
 }
 
+void forward() //designations confirmed dec 4
+{
+ 
+}
+void backward()
+{
+ 
+}
+void leftTurn(int duration)
+{
+
+ delay(duration);                  // Turning time (ms).
+}
+
+ void rightTurn(int duration)
+{
+ 
+ delay(duration);                  // Turning time (ms).
+}
 void calibrate_myservo(){
 while (Serial.available() == 0) // while there is No Xbee signal to start
   {
     esc.write(90); // reset the ESC to neutral (non-moving) value
-    pos = analogRead(myservo.attach(5));            // reads the value of the potentiometer (value between 0 and 1023) 
+    pos = analogRead(myservo.attach(5));  // reads the value of the potentiometer (value between 0 and 1023) 
     pos = map(pos, 0, 1023, 0, 179);     // scale it to use it with the servo (value between 0 and 180) 
     myservo.write(pos);                  // sets the servo position according to the scaled value 
     distance_from_obstacle_1 = lidarGetRange();
@@ -116,16 +138,27 @@ void serialPrintRange(int pos, int distance)
 void loop()
 {
 
-    myservo.write(pos);
-    distance_from_obstacle_1 =lidarGetRange();
-    distance_from_obstacle_2 =  lidarGetRange_2();
-    distance = min(distance_from_obstacle_1,distance_from_obstacle_2);
-    //min_distance [ii] = distance;
-    //if min_distance [ii] <>min_distance [ii-1]
-    // if distance_from_obstacle_1>distance_from_obstacle_2
-    
-    serialPrintRange(pos, distance);
-    delay(20);
+ //long distance;                    // Distance reading from rangefinder.
+ 
+ //forward();                        // Robot moves forward continuously.
+ //do 
+ //{
+ // delay(INTERVAL);                // Delay between readings.
+  // distance = min (lidarGetRange,lidarGetRange_2);      // Take a distance reading.
+  // Serial.println(distance);       // Print it out.             
+//}
+// while((distance >= BOUNDARY)&& //loop til an object is sensed
+        
+}                 
+// else{ //robot has stalled
+     //backward(); delay(1000); //longer backup
+ //}
+//}
+
+
+
+
+
   
-}
+//}
 
