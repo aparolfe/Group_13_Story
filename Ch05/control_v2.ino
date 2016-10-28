@@ -6,6 +6,7 @@
  * lidarright PIN 4,6
  * IR PIN ? ?
  * Xbee PIN ?
+ * assumed that lidarGetRange() will be on the left
  */
 
 
@@ -60,13 +61,13 @@ double radToDeg(double radians){
 void forward()
 {
   myservo.write(90);
-  esc.write(25);
+  esc.write(75);
   delay(100);
 }
 
 void leftTurn(int turnDegree)
   {
-    esc.write(15); // reduce the speed
+    esc.write(75); // reduce the speed
     myservo.write(90 + turnDegree); // update tge servo
     Serial.println("Turning Left with totall offset of :");
     Serial.println(90.0+turnDegree);
@@ -75,7 +76,7 @@ void leftTurn(int turnDegree)
 
 void rightTurn(int turnDegree)
   {
-    esc.write(15);// reduce the speed
+    esc.write(75);// reduce the speed
     myservo.write(90 + turnDegree); // update tge servo
     Serial.println("Turning Right with offset  of :");
     Serial.println(90 + turnDegree);
@@ -96,6 +97,8 @@ while (Serial.available() ==0) // while there is No Xbee signal to start MTA:
     // getting the both distances
     distance_from_obstacle_1 = lidarGetRange();
     distance_from_obstacle_2 = lidarGetRange_2();
+    min_distance_to_wall[0] = min (distance_from_obstacle_1,distance_from_obstacle_2); // keep track of the min distances and store that in the array  
+
     delay(1000);
   }
 delay (1000);
