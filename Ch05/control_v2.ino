@@ -3,22 +3,21 @@
  * servo  PIN 5
  * ESC    PIN 9
  * lidarleft PIN 2,3
- * lidarright PIN 4,6
- * IR PIN ? ?
+ * lidarright PIN A4,A5
+ * IR PIN A0, A1
  * Xbee PIN ?
  * assumed that lidarGetRange() will be on the left
+ * 
  */
-
-
 
 #include <Servo.h>
 #include <math.h>
-#define    INTERVAL     25      // (ms) Interval between distance readings.
+#define    INTERVAL     50      // (ms) Interval between distance readings.
 #define    BOUNDARY     40 // (cm) Avoid objects closer than 30cm.
 
 Servo myservo;
 Servo esc; //ESC can be controlled like a servo.
-
+String stop_start;
 int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
@@ -35,6 +34,7 @@ unsigned long pulse_widthright;
 void setup()
 {
   Serial.begin(9600);
+   stop_start = "stop";
   Serial.println("< calibration Mode started waite for 3 sec >");
   pinMode(2, OUTPUT); // Set pin 2 as trigger pin
   pinMode(3, INPUT); // Set pin 3 as monitor pin
@@ -86,7 +86,7 @@ void calibrate_myservo(){
 
   Serial.println("waiting for Xbee signal to start");
   
-while (Serial.available() ==0) // while there is No Xbee signal to start MTA:
+while ( stop_start == "stop") // while there is No Xbee signal to start MTA:
   {
     esc.write(90); // reset the ESC to neutral (non-moving) value
     pos = analogRead(myservo.attach(5));  // reads the value of the potentiometer (value between 0 and 1023) 
@@ -137,7 +137,6 @@ void loop()
 
  int ii=0; //local conter for the min distances array
  forward();// car moves forward continuously.
-
  // loop note : this loop will be used if the car far from the wall
   do 
    {
@@ -155,7 +154,7 @@ void loop()
           ii = 2;
           }     
     }
- while(min_distance_to_wall[ii] >= BOUNDARY && Serial.available() == 0);//loop til an object is sensed MTA:
+ while(min_distance_to_wall[ii] >= BOUNDARY &&  stop_start == "start");//loop til an object is sensed MTA:
 
 //=======================================================================
 
@@ -183,17 +182,21 @@ void loop()
             Serial.println("calling rightTurn() function");}
                              
     }
- while(min_distance_to_wall[ii] < BOUNDARY &&  Serial.available() ==0);//MTA
+ while(min_distance_to_wall[ii] < BOUNDARY &&  stop_start == "start");//MTA
  //======================================================================
  //??(should be in the loop of turn) to make sure the car is going straight forward() function is called in the next loop to recover the added/subtracted angles
  // when read stop from Xbee, stop
  do{
     esc.write(90); // MTA: 90 means stop
+    if (Serial.available()>0)
+       {stop_start = Serial.readString();
+       break;
+     }   
    }
- while(Serial.available() >0);
+ while( stop_start == "stop");
  //when the IR sensor read something, stop
- do{
-  esc.write(90); // MTA: 90 means stop
- }
- while(true); // ??MTA: WHY ?
+ //do{
+  //esc.write(90);
+ //}
+ //while(true); 
 }
