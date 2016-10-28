@@ -17,10 +17,11 @@ int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
 int distance = 0;                 // Distance measured
-int min_distance [100];           // keep track of the min distances this is can be modified later
+//int min_distance           // keep track of the min distances this is can be modified later
 int pos_to_wall [100];           // keep track of the min distances this is can be modified later
 double maxSpeedOffset = 45; // maximum speed magnitude, in servo 'degrees'
 double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
+int duration;
 
 void setup()
 {
@@ -42,24 +43,28 @@ double radToDeg(double radians){
   return (radians * 4068) / 71;
 }
 
-void forward() //designations confirmed dec 4
+void forward()
 {
+ // myservo.write(10);
+  esc.write(30);
  
 }
-void backward()
-{
- 
-}
+
 void leftTurn(int duration)
 {
+    esc.write(28);
+    double wheelOffset = duration * maxWheelOffset;
+    myservo.write(90 - wheelOffset);
+    delay(duration);
+  }
 
- delay(duration);                  // Turning time (ms).
-}
 
  void rightTurn(int duration)
 {
- 
- delay(duration);                  // Turning time (ms).
+    esc.write(28);
+    double wheelOffset = duration * maxWheelOffset;
+    myservo.write(90 + wheelOffset);
+    delay(duration);
 }
 void calibrate_myservo(){
 while (Serial.available() == 0) // while there is No Xbee signal to start
@@ -143,22 +148,18 @@ void loop()
  //forward();                        // Robot moves forward continuously.
  //do 
  //{
- // delay(INTERVAL);                // Delay between readings.
-  // distance = min (lidarGetRange,lidarGetRange_2);      // Take a distance reading.
-  // Serial.println(distance);       // Print it out.             
+//  delay(INTERVAL);                // Delay between readings.
+  distance = min (lidarGetRange(),lidarGetRange_2());      // Take a distance reading.
+ // Serial.println(lidarGetRange(),lidarGetRange_2());       // Print it out.             
 //}
-// while((distance >= BOUNDARY)&& //loop til an object is sensed
-        
-}                 
-// else{ //robot has stalled
-     //backward(); delay(1000); //longer backup
+ //if(distance >= BOUNDARY)//loop til an object is sensed
+   //myservo.write(10);
+   // esc.write(30); //ESC can be controlled like a servo. 
+ 
+ //}                 
  //}
 //}
 
-
-
-
-
   
-//}
+}
 
