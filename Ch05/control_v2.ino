@@ -85,7 +85,7 @@ void calibrate_myservo(){
 
   Serial.println("waiting for Xbee signal to start");
   
-while (Serial.readString() = "start") // while there is No Xbee signal to start
+while (Serial.available() ==0) // while there is No Xbee signal to start MTA:
   {
     esc.write(90); // reset the ESC to neutral (non-moving) value
     pos = analogRead(myservo.attach(5));  // reads the value of the potentiometer (value between 0 and 1023) 
@@ -152,7 +152,7 @@ void loop()
           ii = 2;
           }     
     }
- while(min_distance_to_wall[ii] >= BOUNDARY);//loop til an object is sensed
+ while(min_distance_to_wall[ii] >= BOUNDARY && Serial.available() == 0);//loop til an object is sensed MTA:
 
 //=======================================================================
 
@@ -180,17 +180,17 @@ void loop()
             Serial.println("calling rightTurn() function");}
                              
     }
- while(min_distance_to_wall[ii] < BOUNDARY);
+ while(min_distance_to_wall[ii] < BOUNDARY &&  Serial.available() ==0);//MTA
  //======================================================================
  //??(should be in the loop of turn) to make sure the car is going straight forward() function is called in the next loop to recover the added/subtracted angles
  // when read stop from Xbee, stop
  do{
-  esc.write(0);
- }
- while(Serial.readString()="stop");
+    esc.write(90); // MTA: 90 means stop
+   }
+ while(Serial.available() >0);
  //when the IR sensor read something, stop
  do{
-  esc.write(0);
+  esc.write(90); // MTA: 90 means stop
  }
- while(true);
+ while(true); // ??MTA: WHY ?
 }
