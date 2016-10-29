@@ -22,7 +22,7 @@
 Servo myservo;
 Servo esc; //ESC can be controlled like a servo.
 int   BOUNDARY = 42;      // (cm) Avoid objects closer than 30cm.
-boolean stop_start;
+String stop_start;
 int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
@@ -111,7 +111,7 @@ void lidarPrintDistance(int sensorNumber, int distance)
 void setup()
 {
   Serial.begin(9600);
-   stop_start = 0; //stop
+   stop_start = "0"; //stop
   Serial.println("< calibration Mode started waite for 3 sec >");
   lidarSetup();
   myservo.attach(5);   // Servo control use pin 5 for PWM to servo
@@ -168,7 +168,7 @@ while ( Serial.available()==0) // while there is No Xbee signal to start MTA:
     Serial.println("inside the calibrate_mode");
     
     // getting the both distances 
-    distance_from_obstacle_1 = 10;//lidarGetDistance(LeftRangeSensor);
+    distance_from_obstacle_1 = 50;//lidarGetDistance(LeftRangeSensor);
     distance_from_obstacle_2 = 50;//lidarGetDistance(RightRangeSensor);
     
     min_distance_to_wall = min (distance_from_obstacle_1,distance_from_obstacle_2); // keep track of the min distances and store that in the array 
@@ -178,7 +178,7 @@ while ( Serial.available()==0) // while there is No Xbee signal to start MTA:
   }
 
   //if ( Serial.available()>0)
-  //{stop_start = 1;}
+  //{stop_start = "1";}
 delay (100);
 }
 
@@ -186,16 +186,15 @@ void loop()
 {
  int ii=0; //local conter for the min distances array
  forward();// car moves forward continuously.
- delay(1000);
  
  // loop note : this loop will be used if the car far from the wall
  
   do 
 
    {         
-       distance_from_obstacle_1 = 10;//lidarGetDistance(LeftRangeSensor);
+       distance_from_obstacle_1 = 50;//lidarGetDistance(LeftRangeSensor);
        distance_from_obstacle_2 = 50;//lidarGetDistance(RightRangeSensor);
-       min_distance_to_wall =10;// min (distance_from_obstacle_1,distance_from_obstacle_2); // keep track of the min distances and store that in the array 
+       min_distance_to_wall =50;// min (distance_from_obstacle_1,distance_from_obstacle_2); // keep track of the min distances and store that in the array 
        
        Serial.println(min_distance_to_wall);       // Print it out.
     if (distance_from_obstacle_1 < distance_from_obstacle_2) // keep track of the closer wheel to the wall
@@ -209,12 +208,13 @@ void loop()
 //          ii = 1;
 //          }
 //
-//     if (Serial.available()>0)
-//       {stop_start = Serial.readString();}
-       delay(1000);
+     delay(1000);
+     if (Serial.available()>0)
+       {stop_start = Serial.readString();}
+       
 //       ii++;
     }
- while(min_distance_to_wall >= BOUNDARY);// &&  stop_start == 1);//loop til an object is sensed MTA:
+ while(min_distance_to_wall >= BOUNDARY &&  stop_start == "1");//loop til an object is sensed MTA:
 
 //=======================================================================
 
@@ -222,7 +222,7 @@ void loop()
 // or 
 // This loop will be used if the car is closer to the left wall then the car should trun right
   
- while(min_distance_to_wall < BOUNDARY)// && stop_start == 1);//MTA
+ while(min_distance_to_wall < BOUNDARY && stop_start == "1")//MTA
    { 
             Serial.println("Test Loop2");       // Print it out.
 
@@ -248,7 +248,7 @@ void loop()
             }
             if (Serial.available()>0)
        {stop_start = Serial.readString();
-       min_distance_to_wall = 50;//lidarGetDistance(LeftRangeSensor);
+       //min_distance_to_wall = 50;//lidarGetDistance(LeftRangeSensor);
 
        }
                              
@@ -263,7 +263,7 @@ void loop()
        break;
      }   
    }
- while( stop_start == 0);
+ while( stop_start == "0");
  //when the IR sensor read something, stop
  //do{
   //esc.write(90);
