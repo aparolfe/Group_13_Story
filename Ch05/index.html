@@ -5,8 +5,24 @@
   </head>
   <body>
     <div class="header"> EC544 Group 13 Crawler Control </div>
-    <div id="change" class="button"></div>    
+    <input type="button" class="bton" id=status value="Start"></input>
+    <!--div id="change" class="button"></div-->    
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="crawler.js"></script>
+    <script>
+	var socket = io();
+	
+	$('.bton').click(function(){
+		var value = $(this).val();
+		if (value == "Start"){
+			$(this).val("Stop");
+			socket.emit('status',value);
+		}	
+		else {
+			$(this).val("Start");
+                        socket.emit('status',value);
+		})
+	});	
+    </script>
   </body>
