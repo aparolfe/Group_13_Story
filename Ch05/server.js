@@ -1,4 +1,4 @@
-//var SerialPort = require("serialport");	//communicate with Xbee coordinator
+var SerialPort = require("serialport");	//communicate with Xbee coordinator
 var express=require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -43,11 +43,11 @@ app.get('/', function(req, res){
 app.get('/start', function(req,res) {
     console.log("Start command received");
     res.sendStatus(204);
-    //sp.write("start");
+    sp.write("1");
 });
 
 app.get('/stop', function(req,res) {
     console.log("Stop command received");
     res.sendStatus(204);
-    //sp.write("stop");
+    sp.write("0");
 });
