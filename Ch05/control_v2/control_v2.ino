@@ -7,6 +7,7 @@
    Xbee PIN Rx, Tx
 
 */
+#include <Timer.h>
 
 #include <Servo.h>
 #include <math.h>
@@ -23,6 +24,7 @@
 #define ServoPin              5   // Servo to control wheel turn (PWM)
 #define EscPin                9   // Speed control (PWM)
 
+Timer t;
 Servo myservo;
 Servo esc;              //ESC can be controlled like a servo.
 int   BOUNDARY = 42;    // (cm) Avoid objects closer than 30cm.
@@ -76,7 +78,7 @@ void setup()
   myservo.attach(ServoPin);   // Servo setup
   esc.attach(EscPin);         // ESC setup
   calibrate_myservo(); // make sure that the servo is in the right position
-
+  t.every(1000,check_xbee);
 
 }
 /* Convert degree value to radians */
@@ -201,6 +203,13 @@ void swerve(int angle) {    // used if the car is too close to a wall and should
   }
 }
 
+void check_xbee()
+{
+   if (Serial.available() > 0)
+    { stop_start = Serial.readString();
+    } 
+}
+
 void loop()
 {
   int ii = 0; // local counter for the min distances array
@@ -224,14 +233,14 @@ void loop()
   //======================================================================
   //??(should be in the loop of turn) to make sure the car is going straight forward() function is called in the next loop to recover the added/subtracted angles
   // when read stop from Xbee, stop
-  do {
+  while ( stop_start == "0"){
     esc.write(90); // MTA: 90 means stop
-    if (Serial.available() > 0)
-    { stop_start = Serial.readString();
-      break;
-    }
+    //if (Serial.available() > 0)
+    //{ stop_start = Serial.readString();
+    //  break;
+    //}
   }
-  while ( stop_start == "0");
+  
   //when the IR sensor read something, stop
   //do{
   //esc.write(90);
