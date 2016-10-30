@@ -73,7 +73,7 @@ void setup()
   stop_start = "0"; //stop
   Serial.println("< calibration Mode started wait for 3 sec >");
   lidarSetup();
-  myservo.attach(ServoPin);   // Servo setup 
+  myservo.attach(ServoPin);   // Servo setup
   esc.attach(EscPin);         // ESC setup
   calibrate_myservo(); // make sure that the servo is in the right position
 
@@ -101,31 +101,31 @@ void turn(String dir, int turnDegree)
 {
   esc.write(70); // reduce the speed
   if (dir == "Left") {
-  myservo.write(90 + turnDegree); // update the servo
-  Serial.println("leftTurn Mode");
+    myservo.write(90 + turnDegree); // update the servo
+    Serial.println("leftTurn Mode");
   }
   if (dir == "Right") {
-  myservo.write(90 - turnDegree); // update the servo
-  Serial.println("rightTurn Mode");
+    myservo.write(90 - turnDegree); // update the servo
+    Serial.println("rightTurn Mode");
   }
   delay(duration);
 }
 /*
-void leftTurn(int turnDegree)
-{
+  void leftTurn(int turnDegree)
+  {
   esc.write(70); // reduce the speed
   myservo.write(90 + turnDegree); // update the servo
   Serial.println("leftTurn Mode");
   delay(duration);
-}
+  }
 
-void rightTurn(int turnDegree)
-{
+  void rightTurn(int turnDegree)
+  {
   esc.write(70);// reduce the speed
   myservo.write(90 + turnDegree); // update the servo
   Serial.println("rightTurn Mode");
   delay(duration);
-}
+  }
 */
 void calibrate_myservo() {
   Serial.println("<===waiting for Xbee signal to start===>");
@@ -154,31 +154,57 @@ void calibrate_myservo() {
   delay (100);
 }
 
-void coast() { // this loop will be used if the car far from the wall
-    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-    distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
-    min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
+void coast() { // used if the car far from the wall
+  distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+  distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
+  min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
 
-    Serial.println(min_distance_to_wall);       // Print it out.
-    if (distance_from_obstacle_1 < distance_from_obstacle_2) // keep track of the closer wheel to the wall
-    {
-      wheel = "left_wheel";
-    }
-    else
-    {
-      wheel = "right_wheel";
-    }
-    delay(1000);
-    if (Serial.available() > 0)
-    {
-      stop_start = Serial.readString();
-    }
+  Serial.println(min_distance_to_wall);       // Print it out.
+  if (distance_from_obstacle_1 < distance_from_obstacle_2) // keep track of the closer wheel to the wall
+  {
+    wheel = "left_wheel";
+  }
+  else
+  {
+    wheel = "right_wheel";
+  }
+  delay(1000);
+  if (Serial.available() > 0)
+  {
+    stop_start = Serial.readString();
+  }
+}
+
+void swerve(int angle) {    // used if the car is too close to a wall and should turn away from the wall
+  Serial.println("Test Loop2");       // Print it out.
+  distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+  distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
+  min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
+
+  double rad = degToRad(angle);
+  double wheelOffset = sin(rad) * maxWheelOffset;
+  Serial.println(BOUNDARY);
+  if (wheel == "left_wheel")
+  { Serial.println("close to left wall");
+    turn("RIGHT", wheelOffset);   //  turn right
+    Serial.println("calling rightTurn() function");
+  }
+  else if (wheel == "right_wheel")
+  { Serial.println("close to right wall");
+    //Serial.println(min_distance_to_wall);
+    turn("LEFT", wheelOffset);      //  turn left
+    Serial.println("calling leftTurn() function");
+  }
+  delay(INTERVAL);                // Delay between readings.
+  if (Serial.available() > 0)
+  { stop_start = Serial.readString();
+  }
 }
 
 void loop()
 {
-  int ii = 0; //local counter for the min distances array
-  forward(); // car moves forward continuously.
+  int ii = 0; // local counter for the min distances array
+  forward();  // car moves forward continuously.
 
   do
   {
@@ -187,42 +213,13 @@ void loop()
   while (min_distance_to_wall >= BOUNDARY &&  stop_start == "1"); //loop til an object is sensed MTA:
 
   //=======================================================================
-
-  //This loop will be used if the car is closer to the right wall then the car should turn left
   // or
   // This loop will be used if the car is closer to the left wall then the car should turn right
 
   while (min_distance_to_wall < BOUNDARY && stop_start == "1")
   {
-    Serial.println("Test Loop2");       // Print it out.
-    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-    distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
-    min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
-
-    double rad = degToRad(ii);
-    double wheelOffset = sin(rad) * maxWheelOffset;
-    Serial.println(BOUNDARY);
-    if (wheel == "left_wheel")
-    { Serial.println("close to left wall");
-
-      turn("RIGHT", wheelOffset);   // calling turn right function
-      ii++; //degree counter
-      Serial.println("calling rightTurn() function");
-      delay(INTERVAL);                // Delay between readings.
-    }
-
-    else if (wheel == "right_wheel")
-    { Serial.println("closer to right wall");
-      //Serial.println(min_distance_to_wall);
-      turn("LEFT", wheelOffset);      // calling turn left function
-      ii++; //degree counter
-      delay(INTERVAL);                // Delay between readings.
-      Serial.println("calling leftTurn() function");
-    }
-    if (Serial.available() > 0)
-    { stop_start = Serial.readString();
-    }
-
+    swerve(ii);
+    ii++; //degree counter
   }
   //======================================================================
   //??(should be in the loop of turn) to make sure the car is going straight forward() function is called in the next loop to recover the added/subtracted angles
