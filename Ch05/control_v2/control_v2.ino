@@ -3,13 +3,13 @@
 #include <math.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      42      // Avoid objects closer than 30cm.
-#define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
+#define BOUNDARY      60      // Avoid objects closer than 30cm.
+#define IR_THRESHOLD  180     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
-// Tracking all used pins - Note CANNOT use pins 3 and 11 because they are controlled by Timer2
+// Tracking all used pins
 #define LeftRangeTrigger      2   // Trigger Pin for LIDAR mounted on device left.
-#define LeftRangeSensor       10  // Monitor Pin for LIDAR mounted on device left.
+#define LeftRangeSensor       3  // Monitor Pin for LIDAR mounted on device left.
 #define RightRangeTrigger     4   // Trigger Pin for LIDAR mounted on device right.
 #define RightRangeSensor      6   // Monitor Pin for LIDAR mounted on device right.
 #define FrontCollisionSensor  A0  // Front SharpIR sensor
@@ -24,9 +24,13 @@ int safety_check;       // Store latest collision sensor reading
 int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
-int min_distance_to_wall ;        // keep track of the min distances this is can be modified later
-double maxSpeedOffset = 45; // maximum speed magnitude, in servo 'degrees'
+int min_distance_to_wall ;        // keep track of the min distance
+double maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
+double currentSpeedOffset = ESC_STOP; // start with speed 0
+double minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
 double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
+int currentTurnDegree = 0; //start with wheels in neutral position
+
 int duration;
 String wheel; // Store which wheel is closer to a wall, used strings are "right_wheel" or "left_wheel"
 unsigned long pulse_width;
@@ -102,7 +106,7 @@ void calibrate_myservo()
     // getting both distances
     distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
     distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
-    min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
+    min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2);
 
     Serial.println("min_distance_to_wall");
     Serial.println(min_distance_to_wall);
@@ -153,15 +157,29 @@ double radToDeg(double radians) {
 
 void forward()
 {
-  myservo.write(90);
-  esc.write(60);
+  //straighten out
+  if (currentTurnDegree != 0)
+  {
+    if (currentTurnDegree < 0) currentTurnDegree++;
+    else currentTurnDegree--;
+    myservo.write(90 + currentTurnDegree);
+  }
+  //speed up
+  if (currentSpeedOffset > maxSpeedOffset) {
+    currentSpeedOffset--;
+    esc.write(currentSpeedOffset);
+  }
   delay(100);
   Serial.println("forward Mode");
 }
 
 void turn(String dir, int turnDegree)
 {
-  esc.write(70); // reduce the speed
+  // reduce the speed
+  if (currentSpeedOffset < minSpeedOffset) {
+    currentSpeedOffset++;
+    esc.write(currentSpeedOffset);
+  }
   if (dir == "left")
   {
     myservo.write(90 + turnDegree); // update the servo
@@ -175,7 +193,7 @@ void turn(String dir, int turnDegree)
   delay(duration);
 }
 
-void coast()  // used if the car far from the walls
+void track_wall()  // used if the car far from the walls
 {
   distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
   distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
@@ -193,24 +211,24 @@ void coast()  // used if the car far from the walls
   delay(1000);
 }
 
-void swerve(int angle)    // used if the car is too close to a wall and should turn away from the wall
+void swerve()    // used if the car is too close to a wall and should turn away from the wall
 {
   Serial.println("Swerving");
-  distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-  distance_from_obstacle_2 = lidarGetDistance(RightRangeSensor);
-  min_distance_to_wall = min (distance_from_obstacle_1, distance_from_obstacle_2); // keep track of the min distances and store that in the array
-
-  double rad = degToRad(angle);
-  double wheelOffset = sin(rad) * maxWheelOffset;
-  Serial.println(BOUNDARY);
+  track_wall();
   if (wheel == "left_wheel")
   {
+    currentTurnDegree++;
+    double rad = degToRad(abs(currentTurnDegree));
+    double wheelOffset = sin(rad) * maxWheelOffset;
     Serial.println("close to left wall");
     turn("right", wheelOffset);   // turn right
     Serial.println("calling rightTurn() function");
   }
   else if (wheel == "right_wheel")
   {
+    currentTurnDegree--;
+    double rad = degToRad(abs(currentTurnDegree));
+    double wheelOffset = sin(rad) * maxWheelOffset;
     Serial.println("close to right wall");
     turn("left", wheelOffset);      // turn left
     Serial.println("calling leftTurn() function");
@@ -220,26 +238,26 @@ void swerve(int angle)    // used if the car is too close to a wall and should t
 
 void loop()
 {
-  int turn_angle = 0;       // local counter for turn degree
+  //int turn_angle = 0;       // local counter for turn degree
   forward();                // car moves forward continuously
   while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall >= BOUNDARY) // if far enough from both walls, keep going
   {
-    coast();
+    forward();
+    track_wall();
   }
   while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall < BOUNDARY) // if too close to a wall, turn away from wall
   {
-    swerve(turn_angle);
-    turn_angle++;
+    swerve();
   }
   while (stop_start == '0')
   {
-    esc.write(ESC_STOP);
+    esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped because of x-bee command");
     delay(200);
   }
   while (safety_check > IR_THRESHOLD)
   {
-    esc.write(ESC_STOP);
+    esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid imminent collision");
     delay(200);
   }
