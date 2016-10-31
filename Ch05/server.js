@@ -2,7 +2,6 @@ var SerialPort = require("serialport");	//communicate with Xbee coordinator
 var express=require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
 
 // uncomment when ready to talk to xBee
 var portName = process.argv[2],
@@ -16,18 +15,6 @@ sp = new SerialPort.SerialPort(portName, portConfig);
 sp.on("open", function () {
     console.log('Serial port open');
 });
-
-io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('disconnect', function(){
-  });
-  socket.on('status', function(msg){
-    console.log(msg);
-    io.emit('status', msg);
-    sp.write(msg + "\n");
-  });
-});
-
 
 app.use(express.static('src'));
 
