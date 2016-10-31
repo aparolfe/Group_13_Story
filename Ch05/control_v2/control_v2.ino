@@ -3,8 +3,8 @@
 #include <math.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      60      // Avoid objects closer than 30cm.
-#define IR_THRESHOLD  180     // Max acceptable reading of front collision sensor
+#define BOUNDARY      80      // Avoid objects closer than 30cm.
+#define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
 // Tracking all used pins
@@ -25,11 +25,13 @@ int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
 int pos = 0;                      // Position of the servo (degress, [0, 180])
 int min_distance_to_wall ;        // keep track of the min distance
-double maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
-double currentSpeedOffset = ESC_STOP; // start with speed 0
+int maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
+int currentSpeedOffset = ESC_STOP; // start with speed 0
+int linearAcc = 4; // Rate of speed change
 double minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
 double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
-int currentTurnDegree = 0; //start with wheels in neutral position
+int currentTurnDegree = 0; // start with wheels in neutral position
+int angleAcc = 8;         // rate of change of turn
 
 int duration;
 String wheel; // Store which wheel is closer to a wall, used strings are "right_wheel" or "left_wheel"
@@ -157,37 +159,41 @@ double radToDeg(double radians) {
 
 void forward()
 {
-  //straighten out
+/*  //straighten out
   if (currentTurnDegree != 0)
   {
-    if (currentTurnDegree < 0) currentTurnDegree++;
-    else currentTurnDegree--;
-    myservo.write(90 + currentTurnDegree);
-  }
-  //speed up
+    if (currentTurnDegree < 0) currentTurnDegree = currentTurnDegree + angleAcc;
+    else currentTurnDegree = currentTurnDegree - angleAcc;
+    turn();
+  } 
+  */
+  currentTurnDegree=0;
+  turn();
+  //speed up 
   if (currentSpeedOffset > maxSpeedOffset) {
-    currentSpeedOffset--;
+    currentSpeedOffset = currentSpeedOffset - linearAcc;
     esc.write(currentSpeedOffset);
-  }
+  } 
   delay(100);
   Serial.println("forward Mode");
 }
 
-void turn(String dir, int turnDegree)
+void turn()
 {
   // reduce the speed
   if (currentSpeedOffset < minSpeedOffset) {
     currentSpeedOffset++;
     esc.write(currentSpeedOffset);
   }
-  if (dir == "left")
+  double rad = degToRad(currentTurnDegree);
+  double wheelOffset = sin(rad) * maxWheelOffset;
+  myservo.write(90 + (int)wheelOffset); // update the servo
+  if (wheelOffset > 0)
   {
-    myservo.write(90 + turnDegree); // update the servo
     Serial.println("leftTurn Mode");
   }
-  if (dir == "right")
+  else if (wheelOffset < 0)
   {
-    myservo.write(90 - turnDegree); // update the servo
     Serial.println("rightTurn Mode");
   }
   delay(duration);
@@ -217,21 +223,19 @@ void swerve()    // used if the car is too close to a wall and should turn away 
   track_wall();
   if (wheel == "left_wheel")
   {
-    currentTurnDegree++;
-    double rad = degToRad(abs(currentTurnDegree));
-    double wheelOffset = sin(rad) * maxWheelOffset;
-    Serial.println("close to left wall");
-    turn("right", wheelOffset);   // turn right
-    Serial.println("calling rightTurn() function");
+    if (currentTurnDegree > -90) {
+      currentTurnDegree = currentTurnDegree - angleAcc;
+      Serial.println("close to left wall");
+      turn();   // turn right
+    }
   }
   else if (wheel == "right_wheel")
   {
-    currentTurnDegree--;
-    double rad = degToRad(abs(currentTurnDegree));
-    double wheelOffset = sin(rad) * maxWheelOffset;
-    Serial.println("close to right wall");
-    turn("left", wheelOffset);      // turn left
-    Serial.println("calling leftTurn() function");
+    if (currentTurnDegree < 90) {
+      currentTurnDegree = currentTurnDegree + angleAcc;
+      Serial.println("close to right wall");
+      turn();      // turn left
+    }
   }
   delay(INTERVAL);                // Delay between readings.
 }
