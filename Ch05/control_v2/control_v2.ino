@@ -8,13 +8,13 @@
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
 // Tracking all used pins
-#define LeftRangeTrigger      2   // Trigger Pin for LIDAR mounted on device left.
-#define LeftRangeSensor       3  // Monitor Pin for LIDAR mounted on device left.
+#define LeftRangeTrigger      3   // Trigger Pin for LIDAR mounted on device left.
+#define LeftRangeSensor       7  // Monitor Pin for LIDAR mounted on device left.
 #define RightRangeTrigger     4   // Trigger Pin for LIDAR mounted on device right.
 #define RightRangeSensor      6   // Monitor Pin for LIDAR mounted on device right.
 #define FrontCollisionSensor  A0  // Front SharpIR sensor
 #define BackCollisionSensor   A1  // Back SharpIR sensor
-#define ServoPin              5   // Servo to control wheel turn (PWM)
+#define ServoPin              8   // Servo to control wheel turn (PWM)
 #define EscPin                9   // Speed control (PWM)
 
 Servo myservo;
