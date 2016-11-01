@@ -14,8 +14,8 @@
 #define RightRangeSensor      6   // Monitor Pin for LIDAR mounted on device right.
 #define FrontCollisionSensor  A0  // Front SharpIR sensor
 #define BackCollisionSensor   A1  // Back SharpIR sensor
-#define ServoPin              8   // Servo to control wheel turn (PWM)
-#define EscPin                9   // Speed control (PWM)
+#define ServoPin              9   // Servo to control wheel turn (PWM)
+#define EscPin                5   // Speed control (PWM)
 
 Servo myservo;
 Servo esc;              // ESC can be controlled like a servo.
@@ -30,6 +30,7 @@ int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
 double minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
 double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
+int wheelNeutral = 100;      // neutral wheel position, in servo 'degrees'
 int currentTurnDegree = 0; // start with wheels in neutral position
 int angleAcc = 8;         // rate of change of turn
 
@@ -102,7 +103,7 @@ void calibrate_myservo()
     esc.write(ESC_STOP);                  // reset the ESC to neutral (non-moving) value
     pos = analogRead(myservo.attach(ServoPin));  // reads the value of the potentiometer (value between 0 and 1023)
     pos = map(pos, 0, 1023, 0, 179);      // scale it to use it with the servo (value between 0 and 180)
-    myservo.write(90);                    // sets the servo position according to the scaled value
+    myservo.write(wheelNeutral);                    // sets the servo position according to the scaled value
     Serial.println("inside the calibrate_mode");
 
     // getting both distances
@@ -187,7 +188,7 @@ void turn()
   }
   double rad = degToRad(currentTurnDegree);
   double wheelOffset = sin(rad) * maxWheelOffset;
-  myservo.write(90 + (int)wheelOffset); // update the servo
+  myservo.write(wheelNeutral + (int)wheelOffset); // update the servo
   if (wheelOffset > 0)
   {
     Serial.println("leftTurn Mode");
