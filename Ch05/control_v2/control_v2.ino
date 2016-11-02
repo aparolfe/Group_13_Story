@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      80      // Avoid objects closer than 30cm.
+#define BOUNDARY      90      // Avoid objects closer than 30cm.
 #define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
@@ -19,22 +19,26 @@
 
 Servo myservo;
 Servo esc;              // ESC can be controlled like a servo.
+
+// Global variables
 char stop_start;        // Store latest xbee command
 int safety_check;       // Store latest collision sensor reading
+// LIDAR
 int distance_from_obstacle_1 = 0; // distance from the wall 1
 int distance_from_obstacle_2 = 0; // distance from the wall 2
-int pos = 0;                      // Position of the servo (degress, [0, 180])
 int min_distance_to_wall ;        // keep track of the min distance
-int maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
+// Servo
+int pos = 0;                      // Position of the servo (degress, [0, 180])
+int maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
+int wheelNeutral = 90;      // neutral wheel position, in servo 'degrees'
+int currentTurnDegree = 0; // start with wheels in neutral position
+int angleAcc = 30;         // rate of change of turn
+//ESC
+int maxSpeedOffset = 75; // maximum speed magnitude, in servo 'degrees'
+int minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
 int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
-double minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
-double maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
-int wheelNeutral = 100;      // neutral wheel position, in servo 'degrees'
-int currentTurnDegree = 0; // start with wheels in neutral position
-int angleAcc = 8;         // rate of change of turn
 
-int duration;
 String wheel; // Store which wheel is closer to a wall, used strings are "right_wheel" or "left_wheel"
 unsigned long pulse_width;
 
@@ -91,14 +95,14 @@ int lidarGetDistance(int sensorNumber)   // Get a measurement from the LIDAR Lit
     else Serial.print("right:");
     Serial.println(pulse_width);              // Print the distance
     return pulse_width;
-    delay(50);
+    delay(1);
   }
 }
 
 void calibrate_myservo()
 {
   Serial.println("<===waiting for Xbee signal to start===>");
-  while ( Serial.available() == 0) // while there is No Xbee signal to start MTA:
+  while ( stop_start == '0') // while there is No Xbee signal to start MTA:
   {
     esc.write(ESC_STOP);                  // reset the ESC to neutral (non-moving) value
     pos = analogRead(myservo.attach(ServoPin));  // reads the value of the potentiometer (value between 0 and 1023)
@@ -175,7 +179,7 @@ void forward()
     currentSpeedOffset = currentSpeedOffset - linearAcc;
     esc.write(currentSpeedOffset);
   } 
-  delay(100);
+  delay(INTERVAL);
   Serial.println("forward Mode");
 }
 
@@ -186,9 +190,11 @@ void turn()
     currentSpeedOffset++;
     esc.write(currentSpeedOffset);
   }
-  double rad = degToRad(currentTurnDegree);
-  double wheelOffset = sin(rad) * maxWheelOffset;
-  myservo.write(wheelNeutral + (int)wheelOffset); // update the servo
+  //double rad = degToRad(currentTurnDegree);
+  //double wheelOffset = sin(rad) * maxWheelOffset;
+  //myservo.write(wheelNeutral + (int)wheelOffset); // update the servo
+  int wheelOffset = currentTurnDegree;
+  myservo.write(wheelNeutral + wheelOffset); // update the servo
   if (wheelOffset > 0)
   {
     Serial.println("leftTurn Mode");
@@ -197,7 +203,7 @@ void turn()
   {
     Serial.println("rightTurn Mode");
   }
-  delay(duration);
+  delay(1);
 }
 
 void track_wall()  // used if the car far from the walls
