@@ -2,8 +2,8 @@
 #include <Servo.h>
 #include <math.h>
 
-#define INTERVAL      10      // (ms) Interval between distance readings.
-#define BOUNDARY      80      // Avoid objects closer than 30cm.
+#define INTERVAL      50      // (ms) Interval between distance readings.
+#define BOUNDARY      90      // Avoid objects closer than 30cm.
 #define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
@@ -32,9 +32,9 @@ int pos = 0;                      // Position of the servo (degress, [0, 180])
 int maxWheelOffset = 85; // maximum wheel turn magnitude, in servo 'degrees'
 int wheelNeutral = 90;      // neutral wheel position, in servo 'degrees'
 int currentTurnDegree = 0; // start with wheels in neutral position
-int angleAcc = 40;         // rate of change of turn
+int angleAcc = 30;         // rate of change of turn
 //ESC
-int maxSpeedOffset = 60; // maximum speed magnitude, in servo 'degrees'
+int maxSpeedOffset = 75; // maximum speed magnitude, in servo 'degrees'
 int minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
 int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
@@ -172,7 +172,7 @@ void forward()
     turn();
   } 
   */
-  currentTurnDegree=5;
+  currentTurnDegree=0;
   turn();
   //speed up 
   if (currentSpeedOffset > maxSpeedOffset) {
@@ -203,7 +203,7 @@ void turn()
   {
     Serial.println("rightTurn Mode");
   }
-  delay(150);
+  delay(1);
 }
 
 void track_wall()  // used if the car far from the walls
@@ -221,7 +221,7 @@ void track_wall()  // used if the car far from the walls
   {
     wheel = "right_wheel";
   }
-  delay(45);
+  delay(1000);
 }
 
 void swerve()    // used if the car is too close to a wall and should turn away from the wall
@@ -256,10 +256,9 @@ void loop()
     forward();
     track_wall();
   }
-  if (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall < BOUNDARY) // if too close to a wall, turn away from wall
+  while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall < BOUNDARY) // if too close to a wall, turn away from wall
   {
     swerve();
- 
   }
   while (stop_start == '0')
   {
