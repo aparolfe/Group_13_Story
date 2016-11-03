@@ -9,6 +9,10 @@ Learning objectives:
 1. learn how to achieve actuation with networked devices
 2. servo control, use rangefinder devices, learn limitations of networked control loops, sensors,and actuators.
 
+##System Overview
+
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/systemoverview.jpg)]
+
 ## Setup and Demo
 
 ### Arduino
