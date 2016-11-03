@@ -11,7 +11,7 @@ Learning objectives:
 
 ##System Overview
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/systemoverview.jpg)
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/systemoverview.png)
 
 ## Setup and Demo
 
