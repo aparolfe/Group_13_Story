@@ -32,10 +32,13 @@ We use a NodeJS server to render a HTML page.
 
 Our crawler
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/prerana/Ch04/static/liveupdates.png)
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112737.jpg)
 
-Historical data view
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/prerana/Ch04/static/historicalview.png)
+LIDAR sensor mounting 
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112755.jpg)
+
+IR sensor mounting 
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112807.jpg)
 
 ## Contributors
 
