@@ -1,0 +1,19 @@
+.header {
+    height:60px;
+    background:purple;
+    width:100%;
+    padding:5px;
+    font-family: Georgia;
+    color: #ffffff;
+    font-size: 36px;
+    text-align:center;
+    margin: -5px;
+}
+
+#chart {
+    background-image:url("map.png");
+    width: 440px;
+    height: 570px;
+    margin:auto;
+    margin-top: 20px;
+}
