@@ -1,5 +1,6 @@
 var SerialPort = require("serialport");
-var app = require('express')();
+var express=require('express');
+var app = express();
 var xbee_api = require('xbee-api');
 var ml = require('machine_learning');
 var xbee_11_rssi = 0;
@@ -9,6 +10,7 @@ var xbee_14_rssi = 0;
 var rssi_total =[];
 var http = require('http').Server(app);
 var io = require('socket.io')(http); 
+app.use(express.static('src'));
 
 var C = xbee_api.constants;
 var XBeeAPI = new xbee_api.XBeeAPI({
@@ -17,7 +19,7 @@ var XBeeAPI = new xbee_api.XBeeAPI({
 
 var portName = process.argv[2];
 
-var sampleDelay = 3000;
+var sampleDelay = 2000;
 
 
 //Note that with the XBeeAPI parser, the serialport's "data" event will not fire when messages are received!
@@ -200,6 +202,40 @@ var x_result_window_end=
     6.5,  6.5,  6.5,
     7.5,  7.5,  7.5 ]
 
+var x_data_corridor_1=[[ 64, 79, 59, 75 ],
+  [ 69, 75, 77, 75 ],
+  [ 51, 77, 51, 80 ],
+  [ 58, 72, 64, 80 ],
+  [ 62, 84, 61, 76 ],
+  [ 60, 78, 52, 74 ],
+  [ 50, 84, 57, 75 ],
+  [ 50, 70, 59, 83 ],
+  [ 58, 76, 67, 82 ],
+  [ 58, 82, 75, 92 ],
+  [ 53, 77, 67, 86 ],
+  [ 55, 69, 70, 90 ],
+  [ 54, 66, 67, 92 ],
+  [ 51, 66, 61, 98 ],
+  [ 54, 74, 66, 88 ],
+  [ 61, 66, 72, 89 ],
+  [ 45, 76, 80, 93 ],
+  [ 59, 63, 79, 94 ],
+  [ 50, 61, 76, 96 ],
+  [ 72, 66, 76, 97 ],
+  [ 60, 70, 78, 92 ],
+  [ 53, 69, 69, 92 ],
+  [ 52, 73, 78, 95 ],
+  [ 50, 70, 73, 92 ],
+  [ 48, 65, 75, 92 ],
+  [ 53, 60, 79, 96 ],
+  [ 45, 62, 75, 94 ],
+  [ 46, 68, 86, 95 ],
+  [ 49, 57, 83, 96 ],
+  [ 44, 60, 77, 90 ],
+  [ 38, 54, 83, 96 ]]
+
+var x_result_corridor = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 // Final Training data
 var y_data = y_data_corridor_1 .concat(y_data_corridor_2).concat(y_data_short_ends)
 var y_result = y_result_corridor.concat(y_result_corridor).concat(y_result_short_ends)
@@ -210,7 +246,7 @@ function predict(input,knn){
         var predicted = knn.predict({
                 x: input,
                 k: 3,
-                weightf : {type : 'gaussian', sigma : 10.0},
+                weightf : {type : "none"},//'gaussian', sigma : 10.0},
                 distance : {type : 'euclidean'}
         });
         return predicted
@@ -269,7 +305,7 @@ io.on('connection', function(socket){
 });
 
 
-setInterval(predict_and_send,1000);
+setInterval(predict_and_send,2000);
 
 http.listen(3000, function(){
   console.log('listening on *:3000');

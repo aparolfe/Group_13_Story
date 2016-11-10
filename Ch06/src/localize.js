@@ -5,14 +5,14 @@ var data;
 var chart;
 var options = {
     hAxis: {
-	minValue: 0,
-	maxValue: 7,
+	minValue: -0.5,
+	maxValue: 7.5,
 	textPosition: 'none',
 	gridlines: {count: 0}
     },
     vAxis: {
 	minValue: 0,
-	maxValue: 21,
+	maxValue: 20,
 	textPosition: 'none',
 	baselineColor: 'white',
 	gridlines: {count:0}
@@ -27,10 +27,10 @@ var colors = ['#f3e5f5', '#e1bee7','#ce93d8','#ba68c8','#ab47bc','#9c27b0','#8e2
 var sizes = [1,2,3,4,5,6,7,8,9,10]; // small to big
 
 // given a new point, updates all 10 points and replots chart
-function updateChart() {
+function updateChart(x,y) {
     //generate x and y (eventually will be real data)
-    var x = (Math.floor(Math.random() * 6));
-    var y = (Math.floor(Math.random() * 20));
+//    var x = (Math.floor(Math.random() * 6));
+//    var y = (Math.floor(Math.random() * 20));
     // add new point, latest and hence boldest
     var style = 'point { size:'+ sizes[pointCount] +'; fill-color:'+ colors[pointCount] +'; }' ;
     var point=[ x , y , style];
@@ -64,10 +64,10 @@ function drawChart() {
     setInterval(updateChart,2000);
 }
 
-/* To get data from the server uncomment this
+// To get data from the server uncomment this
    var socket = io();
    socket.on('data', function(msg){
-   console.log("got data");
+   console.log("got data: x",msg.x,"y",msg.y );
    updateChart(msg.x,msg.y);
    });
-*/
+
