@@ -8,7 +8,21 @@ Learn the different strategies for indoor localization (positioning); adaptation
 
 ## Installation & Setup & System Overview
 
+Problem statement/description
 ![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch06/static/systemoverview.png)
+
+Solution
+
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/readme/Ch06/static/systemoverview1.png)
+
+
+##Design Decisions
+
+1. Xbees versus Photon: We choose to use the Xbee beacause of the uncertain network coverage with photons
+2. Four beacons: 3 are necessary, 4 adds accuracy; more beacons the better. We choose 4 because of the hardware limitation
+3. Knn localization: x and y co-ordinates trained/predicted separately. Nearest neighbor used for prediction.
+4. Node.js server: Serial communication with xBee, socket communicaton with website.
+5. Display of data: Google charts; Easy to animate display of current and previous locations.
 
 ## Setup and Demo
 
@@ -30,6 +44,8 @@ Configure the XBee by following the steps shown in [XBee setup guide and configu
 To obtain the RSSI from the beacons(stack of arduino and a XBee shield) use the following code on the arduino ![arduino code](https://github.com/EC544-BU/EC544_demos/blob/master/demos/rssi/rssiBeacon/rssiBeacon.ino) and the following NodeJS server on the localhost ![NodeJS Server code](https://github.com/EC544-BU/EC544_demos/blob/master/demos/rssi/rssiBeacon/rssiBeacon.ino) 
 
 ### Webpage
+
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/readme/Ch06/static/webpage.png)
 
 We have our own webpage that displays the position of the given device tracked
 
