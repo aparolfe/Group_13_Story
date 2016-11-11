@@ -5,17 +5,20 @@ var data;
 var chart;
 var options = {
     hAxis: {
-	minValue: -0.5,
-	maxValue: 7.5,
+	minValue: 0,
+	maxValue: 8,
 	textPosition: 'none',
-	gridlines: {count: 0}
+	baselineColor: 'white',
+	gridlines: {count: 0},
+	ticks: 1
     },
     vAxis: {
 	minValue: 0,
-	maxValue: 20,
+	maxValue: 21,
 	textPosition: 'none',
 	baselineColor: 'white',
-	gridlines: {count:0}
+	gridlines: {count:0},
+	ticks: 1
     },
     legend: 'none',
     backgroundColor: 'transparent',
@@ -28,12 +31,9 @@ var sizes = [1,2,3,4,5,6,7,8,9,10]; // small to big
 
 // given a new point, updates all 10 points and replots chart
 function updateChart(x,y) {
-    //generate x and y (eventually will be real data)
-//    var x = (Math.floor(Math.random() * 6));
-//    var y = (Math.floor(Math.random() * 20));
     // add new point, latest and hence boldest
     var style = 'point { size:'+ sizes[pointCount] +'; fill-color:'+ colors[pointCount] +'; }' ;
-    var point=[ x , y , style];
+    var point=[ x , y , style ];
     data.addRow([ x, y, style ]);
     var numPoints = data.getNumberOfRows();
     // if too many points, remove oldest one
@@ -58,7 +58,11 @@ function drawChart() {
     data.addColumn('number','x');
     data.addColumn('number','y');
     data.addColumn({'type': 'string', 'role': 'style'});
-    chart = new google.visualization.ScatterChart(document.getElementById('chart'));
+    data.addRow([ 1, 1, 'point { size:5; fill-color:#4a148c; }' ]);
+    data.addRow([ 7, 1, 'point { size:5; fill-color:#4a148c; }' ]);
+    data.addRow([ 1, 20, 'point { size:5; fill-color:#4a148c; }' ]);
+    data.addRow([ 7, 20, 'point { size:5; fill-color:#4a148c; }' ]);
+    chart = new google.visualization.ScatterChart(document.getElementById('plot'));
     chart.draw(data, options);
     //when we are getting real data, comment out next line
     setInterval(updateChart,2000);

@@ -12,8 +12,17 @@
 
 #chart {
     background-image:url("map.png");
-    width: 440px;
-    height: 570px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    width: 420px;
+    height: 530px;
     margin:auto;
     margin-top: 20px;
+}
+
+#plot {
+    width: 410px;
+    height: 510px;
+    margin-left:5px;
+    padding-top:25px;
 }
