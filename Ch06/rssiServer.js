@@ -234,13 +234,49 @@ var x_data_corridor_1=[[ 64, 79, 59, 75 ],
   [ 44, 60, 77, 90 ],
   [ 38, 54, 83, 96 ]]
 
-var x_result_corridor = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+var x_result_corridor_1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+var x_data_corridor_2 = [ [ 81, 72, 48, 89 ],
+  [ 81, 72, 54, 93 ],
+  [ 71, 66, 47, 86 ],
+  [ 70, 62, 51, 90 ],
+  [ 77, 63, 53, 91 ],
+  [ 76, 66, 48, 88 ],
+  [ 69, 63, 63, 87 ],
+  [ 75, 59, 64, 93 ],
+  [ 71, 57, 69, 89 ],
+  [ 74, 63, 52, 97 ],
+  [ 72, 72, 59, 94 ],
+  [ 70, 55, 58, 96 ],
+  [ 75, 62, 60, 96 ],
+  [ 75, 65, 62, 97 ],
+  [ 69, 66, 69, 98 ],
+  [ 72, 59, 62, 98 ],
+  [ 63, 55, 66, 98 ],
+  [ 75, 60, 71, 95 ],
+  [ 66, 57, 65, 95 ],
+  [ 68, 56, 60, 95 ],
+  [ 65, 55, 62, 95 ],
+  [ 67, 57, 74, 95 ],
+  [ 59, 55, 69, 95 ],
+  [ 67, 59, 73, 95 ],
+  [ 61, 52, 69, 95 ],
+  [ 62, 50, 76, 95 ],
+  [ 64, 55, 69, 95 ],
+  [ 68, 47, 69, 95 ],
+  [ 54, 57, 70, 95 ],
+  [ 56, 46, 72, 95 ],
+  [ 58, 44, 62, 97 ],
+  [ 55, 45, 69, 97 ],
+  [ 51, 55, 67, 97 ] ]
+
+var x_result_corridor_2 =[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]
 
 // Final Training data
-var y_data = y_data_corridor_1 .concat(y_data_corridor_2).concat(y_data_short_ends)
-var y_result = y_result_corridor.concat(y_result_corridor).concat(y_result_short_ends)
-var x_data = x_data_elevator_end.concat(x_data_window_end)
-var x_result = x_result_elevator_end.concat(x_result_window_end)
+var y_data = y_data_corridor_1 .concat(y_data_corridor_2).concat(y_data_short_ends).concat(x_data_corridor_2)
+var y_result = y_result_corridor.concat(y_result_corridor).concat(y_result_short_ends).concat(x_result_corridor_2)
+var x_data = x_data_elevator_end.concat(x_data_window_end).concat(x_data_corridor_1)
+var x_result = x_result_elevator_end.concat(x_result_window_end).concat(x_result_corridor_1)
 
 function predict(input,knn){
         var predicted = knn.predict({
