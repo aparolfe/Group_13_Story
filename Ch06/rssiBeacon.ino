@@ -30,7 +30,12 @@ This example is for Series 2 XBee
 */
 
 // Should be a unique ID between 0 and 255.
-uint8_t BEACON_ID = 10;
+uint8_t BEACON_ID = 11;
+//uint8_t BEACON_ID = 12;
+//uint8_t BEACON_ID = 13;
+//uint8_t BEACON_ID = 14;
+
+
 
 
 XBee xbee = XBee();
@@ -115,10 +120,6 @@ int sendATCommand(AtCommandRequest atRequest) {
 void sendRSSIValue(XBeeAddress64 targetAddress, int rssiValue){
   uint8_t value = (uint8_t) rssiValue;
   uint8_t values[] = {value, BEACON_ID};
-  Serial.println("=========");
-  
-  Serial.println(BEACON_ID);
-  
   ZBTxRequest zbTx = ZBTxRequest(targetAddress, values, sizeof(values));
   sendTx(zbTx);
 }
@@ -194,10 +195,7 @@ void processResponse(){
             
       XBeeAddress64 replyAddress = rx.getRemoteAddress64();
       int rssi = sendATCommand(dbCommand);
-      Serial.println("==================------================");
       sendRSSIValue(replyAddress, rssi);
-      Serial.println("====================+++++==============");
-
       Serial.println("");
         
       }

@@ -58,20 +58,14 @@ function drawChart() {
     data.addColumn('number','x');
     data.addColumn('number','y');
     data.addColumn({'type': 'string', 'role': 'style'});
-    data.addRow([ 1, 1, 'point { size:5; fill-color:#4a148c; }' ]);
-    data.addRow([ 7, 1, 'point { size:5; fill-color:#4a148c; }' ]);
-    data.addRow([ 1, 20, 'point { size:5; fill-color:#4a148c; }' ]);
-    data.addRow([ 7, 20, 'point { size:5; fill-color:#4a148c; }' ]);
     chart = new google.visualization.ScatterChart(document.getElementById('plot'));
     chart.draw(data, options);
-    //when we are getting real data, comment out next line
-    setInterval(updateChart,2000);
 }
 
 // To get data from the server uncomment this
    var socket = io();
    socket.on('data', function(msg){
    console.log("got data: x",msg.x,"y",msg.y );
-   updateChart(msg.x,msg.y);
+       updateChart(msg.x,msg.y);
    });
 

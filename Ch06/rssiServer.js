@@ -60,9 +60,18 @@ XBeeAPI.on("frame_object", function(frame) {
 	if (frame.data[1] == 14)
 	{ xbee_14_rssi = frame.data[0];}
 	rssi_total =[xbee_11_rssi,xbee_12_rssi,xbee_13_rssi,xbee_14_rssi];
-	console.log(rssi_total);
+	//console.log(rssi_total);
     }
 });
+
+//Fix for the failed beacon
+function ignore_third(data) {
+    var length = data.length;
+    for (var ii = 0; ii < length; ii++) {
+	data[ii].splice(2,1);
+    }
+    return data;
+}
 
 // Training Data
 var data_corridor_1 =
@@ -222,7 +231,7 @@ var y_result_elevators =
   1, 1, 1, 1, 1, 1 ];
 
 // Final Training data
-var data =  data_corridor_1.concat(data_corridor_2).concat(data_windows).concat(data_elevators);
+var data =  ignore_third(data_corridor_1.concat(data_corridor_2).concat(data_windows).concat(data_elevators));
 var y_result = y_result_corridor.concat(y_result_corridor).concat(y_result_windows).concat(y_result_elevators);
 var x_result = x_result_corridor_1.concat(x_result_corridor_2).concat(x_result_short).concat(x_result_short);
 
@@ -231,14 +240,14 @@ var x_predicted = 0;
 var y_predicted = 0;
 
 function predict(input,knn){
-        var predicted = knn.predict({
-                x: input,
-                k: 1,
-                weightf : {type : "none"},//'gaussian', sigma : 10.0},
-                distance : {type : 'euclidean'}
-        });
+    var predicted = knn.predict({
+        x: input,
+        k: 1,
+        weightf : {type : "none"},
+        distance : {type : 'euclidean'}
+    });
     return predicted;
-}
+};
 
 var x_knn = new ml.KNN({
     data : data,
@@ -251,25 +260,26 @@ var y_knn = new ml.KNN({
 });
 
 function predict_and_send(){
-	console.log(rssi_total);
-	x_predicted= predict(rssi_total,x_knn);
-	y_predicted = predict(rssi_total,y_knn);
-	console.log(x_predicted,y_predicted);
-	io.emit('data',{x:x_predicted,y:y_predicted});        
+    rssi_total.splice(2,1);		// Fix for failed xBee
+    console.log(rssi_total);
+    x_predicted= predict(rssi_total,x_knn);
+    y_predicted = predict(rssi_total,y_knn);
+    console.log(x_predicted,y_predicted);
+    io.emit('data',{x:x_predicted,y:y_predicted});        
 }
 
 io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('update',function(msg){
-        console.log(msg);
-        sp.write(msg);
-        });
+    console.log('a user connected');
+    socket.on('update',function(msg){
+	console.log(msg);
+	sp.write(msg);
+    });
 });
 
 setInterval(predict_and_send,2000);
 
 http.listen(3000, function(){
-  console.log('listening on *:3000');
+    console.log('listening on *:3000');
 });
 
 app.get('/', function(req, res){
