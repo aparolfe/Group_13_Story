@@ -8,7 +8,7 @@ Learn the different strategies for indoor localization (positioning); adaptation
 
 ## Installation & Setup & System Overview
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch06/static/systemoverview.png)
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/ch06/Ch06/static/systemoverview.png)
 
 ## Setup and Demo
 
