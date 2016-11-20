@@ -99,7 +99,10 @@ void sendCommand(uint32_t destination_Addr, uint8_t* payload, uint8_t length) {
 //============================================================
 
 //============= Election Method================
-
+void Electing(void)
+{
+ Serial.println(" ") 
+  }
 //=============================================
 void loop() {
   
