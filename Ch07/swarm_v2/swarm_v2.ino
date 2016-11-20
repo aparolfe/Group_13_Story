@@ -1,27 +1,31 @@
 #include <XBee.h>
 #include <SoftwareSerial.h>
 
+XBee xbee = XBee();
+SoftwareSerial xbeeSerial(2, 3);
+ZBRxResponse rxResponse = ZBRxResponse();
+ZBTxRequest txRequest;
 
 const int BLUE_LED=6;    // leader
 const int RED_LED=4;    // infected
 const int GREEN_LED=5;    // clear
 const int PIN_BUTTON=8;     // infection button
+
 bool leader = true;
 bool infected = false;
 int wait_for_Leader_heart_beat = 4000;
 
 uint32_t immunityTimeout=millis();
 uint32_t infectionRebroadcastTimeout=millis();
+uint32_t myID = 0xA1;
 
-const uint8_t 
+const uint8_t Massage,
               IsthereLeader = 0xC1,
               HeartBeat_Reply = 0xC2,
               Clear_Infection = 0xC3,
-              Infection_to_all = 0xC3, 
+              Infection_to_all = 0xC3;
 
 
-ZBRxResponse rxResponse = ZBRxResponse();
-ZBTxRequest txRequest;
 
 void setup() {
   Serial.begin(57600);
@@ -101,11 +105,17 @@ void sendCommand(uint32_t destination_Addr, uint8_t* payload, uint8_t length) {
 //============= Election Method================
 void Electing(void)
 {
- Serial.println(" ") 
-  }
+   sendCommand(0x0000FFFF, (uint8_t*) & myID, 1);
+
+ }
 //=============================================
 void loop() {
   
+}
+
+    xbee.getResponse().getZBRxResponse(rxResponse);
+    Massage = rxResponse.getData(0);
+
       if (leaderAddress == myAddress) {
           set_Leds(isLeader,isInfected);
           sendCommand(0x0000FFFF, (uint8_t*) & HeartBeat_Reply, 1);
@@ -122,8 +132,6 @@ void loop() {
                 set_Leds(!isLeader,isInfected);
               }
             }
-  
-
     }
 
 
