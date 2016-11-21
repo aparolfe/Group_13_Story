@@ -25,7 +25,7 @@ int immunity_timeout = 3000;     // time of immunity
 int election_timeout = 3000;     // time to wait before deciding self is leader
 
 int heartbeat_period = 5000;    // time between sent heartbeats
-int infection_period = 2000;    // time between sent infection messages
+int infection_period = 8000;    // time between sent infection messages
 
 char myID;
 
@@ -53,10 +53,6 @@ void setup() {
   pinMode(RED_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
 
-  /*  // Make all LED's on to indicate that we are in the setup mode
-    digitalWrite(BLUE_LED, HIGH);
-    digitalWrite(RED_LED, HIGH);
-    digitalWrite(GREEN_LED, HIGH); */
   set_leds();
 }
 
@@ -81,25 +77,11 @@ void set_leds() {
   }
 }
 
-//========================== Send API Messages====================
+//============= Send API Messages================
 
 void sendCommand(uint32_t destination_Addr, uint8_t* payload, uint8_t length) {
-
-  //if (payload[0] == MSG_DISCOVERY || payload[0] == MSG_VICTORY) {
   txRequest = ZBTxRequest(XBeeAddress64(0x00000000, 0x0000FFFF), payload, length);
-  //Serial.println("SENDING...");
   xbee.send(txRequest);
-  /* } else {
-     if (destination_Addr == 0x0000FFFF) {
-       for (int i = 0; i < numDevices; i++) {
-         txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, listAddress64[i]), payload, length);
-         xbee.send(txRequest);
-       }
-     } else {
-       txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, destination_Addr), payload, length);
-       xbee.send(txRequest);
-     }
-    } */
 }
 
 //============= Election Method ================
@@ -166,9 +148,9 @@ void loop() {
         }
       case INFECTION: if (!isleader && !isinfected) infect(); break;
       case CLEAR: if (!isleader && isinfected) disinfect(); break;
-        //default: Serial.println("default"); elect(); break;
     }
   }
+  
   // Trigger election if no heartbeat for too long
   if (millis() > last_heartbeat + heartbeat_timeout) { last_heartbeat = millis(); Serial.println("Timeout ELECTION"); elect(); }
 
@@ -177,10 +159,10 @@ void loop() {
     sendCommand(0x0000FFFF, (uint8_t*) & HEARTBEAT, 1);
     last_heartbeat = millis();
   }
-/*  if (isinfected && (millis() > last_infected + infection_period)) {
+  if (isinfected && (millis() > last_infected + infection_period)) {
     sendCommand(0x0000FFFF, (uint8_t*) & INFECTION, 1);
     last_infected = millis();
-  } */
+  } 
 
   // Handle button press
   int reading = digitalRead(PIN_BUTTON);
@@ -188,7 +170,6 @@ void loop() {
     // reset the debouncing timer
     lastDebounceTime = millis();
   }
-
   if ((millis() - lastDebounceTime) > debounceDelay) {
     // whatever the reading is at, it's been there for longer
     // than the debounce delay, so take it as the actual current state:
@@ -206,8 +187,3 @@ void loop() {
   // it'll be the lastButtonState:
   lastButtonState = reading;
 }
-
-
-
-
-
