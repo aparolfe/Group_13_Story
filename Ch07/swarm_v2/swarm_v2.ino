@@ -1,12 +1,12 @@
 #include <XBee.h>
 #include <SoftwareSerial.h>
+#include <EEPROM.h>
 
 XBee xbee = XBee();
 SoftwareSerial xbeeSerial(2, 3);
 ZBRxResponse rxResponse = ZBRxResponse();
 ZBTxRequest txRequest;
 
-const int button = 8;
 const int BLUE_LED = 6;  // leader
 const int RED_LED = 4;  // infected
 const int GREEN_LED = 5;  // clear
@@ -19,14 +19,14 @@ unsigned long debounceDelay = 50;    // the debounce time; increase if the outpu
 
 
 
-bool isleader = false;
+bool isleader = true;
 bool isinfected = false;
 int wait_for_Leader_heart_beat = 4000;
 int heartbeat_period = 5000;
 int infection_period = 2000;
 int immunity_period = 3000;
-
-uint32_t myID = 0xA1;
+int election_period = 3000;
+char myID;
 
 uint8_t message;
 const uint8_t IsthereLeader = 0xC1,
@@ -37,12 +37,23 @@ const uint8_t IsthereLeader = 0xC1,
 uint32_t last_immune = millis();
 uint32_t last_heartbeat = millis();
 uint32_t last_infected = millis();
+uint32_t last_election = millis();
+
+
 
 void setup() {
+
   Serial.begin(57600);
   xbeeSerial.begin(57600);
   xbee.begin(xbeeSerial);
-  pinMode(button, INPUT);
+
+  //for (int i = 0; i < 1; i++) {
+    myID = EEPROM.read(0);
+ // }
+  Serial.println("Read");
+  Serial.println(myID);
+
+  pinMode(PIN_BUTTON, INPUT);
 
   pinMode(BLUE_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
@@ -119,19 +130,36 @@ void sendCommand(uint32_t destination_Addr, uint8_t* payload, uint8_t length) {
 //============= Election Method================
 void elect(void)
 {
+  last_election = millis();
   sendCommand(0x0000FFFF, (uint8_t*) & myID, 1);
+  Serial.println("election");
+  while (millis() < last_election + election_period) {
+    if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
+      xbee.getResponse().getZBRxResponse(rxResponse);
+      message = rxResponse.getData(0);
+      Serial.println(message);
+      Serial.println(myID);
+      if(message >  (int)myID){
+        Serial.println("compare");
+        isleader = false;
+        set_leds();
+        break;
+      }
+    }
 
+  }
+  set_leds();
 }
 //=============================================
 
 void infect(void) {
-  if (millis() > last_immune + immunity_period){
+  if (millis() > last_immune + immunity_period) {
     isinfected = true;
     set_leds();
     sendCommand(0x0000FFFF, (uint8_t*) & INFECTION, 1);
     last_infected = millis();
-    } 
   }
+}
 void disinfect(void) {
   isinfected = false;
   set_leds();
@@ -143,9 +171,6 @@ void loop() {
 
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-    //remoteAddress64 = rxResponse.getRemoteAddress64().getLsb();
-
-    //serialLog(true, remoteAddress64, rxResponse.getData(0));
     message = rxResponse.getData(0);
 
     Serial.println(message);
@@ -156,10 +181,12 @@ void loop() {
           else last_heartbeat = millis();
           break;
         }
-      case INFECTION: if(!isleader) infect(); break;
-      case CLEAR: if(!isleader) disinfect(); break;
+      case INFECTION: if (!isleader) infect(); break;
+      case CLEAR: if (!isleader) disinfect(); break;
+      default: elect(); break;
     }
   }
+  
 
   if (isleader && (millis() > last_heartbeat + heartbeat_period)) {
     sendCommand(0x0000FFFF, (uint8_t*) & HEARTBEAT, 1);
@@ -172,7 +199,7 @@ void loop() {
   }
 
   //debouncing
-  int reading = digitalRead(button);
+  int reading = digitalRead(PIN_BUTTON);
   if (reading != lastButtonState) {
     // reset the debouncing timer
     lastDebounceTime = millis();
