@@ -40,30 +40,30 @@ We connfigured all our XBees in API mode and all of them as routers.
 ##Algorithm 
 
 ###Leader Election
-If HeartBeat(leader alive message) not received: trigger election
-If leader hears HeartBeat from someone else: trigger election
-        Find device with highest id#
-        Update all device statuses to leader or not-leader
+- If HeartBeat(leader alive message) not received: trigger election.
+- If leader hears HeartBeat from someone else: trigger election
+        - Find device with highest id#
+        - Update all device statuses to leader or not-leader
 
 
 ###Non-leader behavior
-Listen for message
-    If infection message received:
+- Listen for message
+    - If infection message received:
         RED led on
         Become infected
         Continuously broadcast infected message 
-    If clear message received:
+    - If clear message received:
         GREEN led on
         Return to clear state
         Send clear message
         Immune for 3 seconds
-    If button pressed:
-Become infected
+    - If button pressed:
+- Become infected
 
 ###Leader behavior
-BLUE led on
-Send HeartBeat
-If button pressed:
+- BLUE led on
+- Send HeartBeat
+- If button pressed:
     Send clear message
 
 ## Contributors
