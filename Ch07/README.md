@@ -64,7 +64,7 @@ We connfigured all our XBees in API mode and all of them as routers.
 - BLUE led on
 - Send HeartBeat
 - If button pressed:
-    Send clear message
+    - Send clear message
 
 ## Contributors
 
