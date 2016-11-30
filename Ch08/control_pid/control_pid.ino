@@ -94,7 +94,7 @@ void lidarSetup()   // Set up trigger and monitor pins, set trigger pins to low 
 }
 void PIDSetup()
 {
-  myPID_servo.SetOutputLimits(-90, 90);
+  myPID_servo.SetOutputLimits(0, 90);
   myPID_servo.SetMode(AUTOMATIC);
 //  myPID_servo.SetOutputLimits(90, 45);
 //  myPID_servo.SetMode(AUTOMATIC);
@@ -198,22 +198,25 @@ void forward()
 
 void turn()
 {
-   reduce the speed
+   //reduce the speed
   if (currentSpeedOffset < minSpeedOffset) {
     currentSpeedOffset++;
     esc.write(currentSpeedOffset);
   }
 //  myPID_speed.Compute();
 //  esc.write(wheelNeutral + Output_speed); // update the esc
+  Input_servo = min_distance_to_wall;
   myPID_servo.Compute();
   myservo.write(wheelNeutral + Output_servo); // update the servo
-  if (Output_servo > 0)
+  if (distance_from_obstacle_1 < distance_from_obstacle_2) // keep track of the closer wheel to the wall
   {
     Serial.println("leftTurn Mode");
+    myservo.write(wheelNeutral - Output_servo); // update the servo
   }
-  else if (Output_servo < 0)
+  else
   {
     Serial.println("rightTurn Mode");
+    myservo.write(wheelNeutral + Output_servo); // update the servo
   }
   delay(1);
 }
