@@ -4,7 +4,7 @@
 #include <PID_v1.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      90      // Avoid objects closer than 30cm.
+#define BOUNDARY      98      // Avoid objects closer than 30cm.
 #define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
@@ -30,17 +30,20 @@ int distance_from_obstacle_2 = 0; // distance from the wall 2
 int min_distance_to_wall ;        // keep track of the min distance
 // Servo
 int pos = 0;                      // Position of the servo (degress, [0, 180])
-int wheelNeutral = 90;      // neutral wheel position, in servo 'degrees'
+int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 
 //ESC
-int maxSpeedOffset = 75; // maximum speed magnitude, in servo 'degrees'
-int minSpeedOffset = 80; // minimum speed magnitude, in servo 'degrees'
+int maxSpeedOffset = 60; // maximum speed magnitude, in servo 'degrees'
+int minSpeedOffset = 70; // minimum speed magnitude, in servo 'degrees'
+int minSpeedbackward = 95;
+int maxSpeedbackward =105;
+
 int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
 //set PID parameters
 double Input_servo, Output_servo;
 double Input_speed, Output_speed;
-double Setpoint = 90;
+double Setpoint = 98;
 int Kp_servo = 2;
 int Ki_servo = 0.05;
 int Kd_servo = 0.5;
@@ -49,8 +52,6 @@ int Ki_speed = 0.05;
 int Kd_speed = 0.5;
 PID myPID_servo(&Input_servo, &Output_servo, &Setpoint, Kp_servo, Ki_servo, Kd_servo, DIRECT);
 PID myPID_speed(&Input_speed, &Output_speed, &Setpoint, Kp_speed, Ki_speed, Kd_speed, DIRECT);
-
-
 
 String wheel; // Store which wheel is closer to a wall, used strings are "right_wheel" or "left_wheel"
 unsigned long pulse_width;
@@ -199,10 +200,10 @@ void forward()
 void turn()
 {
    //reduce the speed
-  if (currentSpeedOffset < minSpeedOffset) {
-    currentSpeedOffset++;
-    esc.write(currentSpeedOffset);
-  }
+//  if (currentSpeedOffset < minSpeedOffset) {
+//    currentSpeedOffset++;
+//    esc.write(minSpeedOffset);
+//  }
 //  myPID_speed.Compute();
 //  esc.write(wheelNeutral + Output_speed); // update the esc
   Input_servo = min_distance_to_wall;
@@ -212,11 +213,13 @@ void turn()
   {
     Serial.println("leftTurn Mode");
     myservo.write(wheelNeutral - Output_servo); // update the servo
+      esc.write(minSpeedOffset);
   }
   else
   {
     Serial.println("rightTurn Mode");
     myservo.write(wheelNeutral + Output_servo); // update the servo
+      esc.write(minSpeedOffset);
   }
   delay(1);
 }
@@ -274,10 +277,63 @@ void loop()
     Serial.println("Stopped because of x-bee command");
     delay(200);
   }
-  while (safety_check > IR_THRESHOLD)
+
+ //=============== Manual Mode =============================
+ 
+    while (stop_start == 'w' && safety_check >= IR_THRESHOLD)
   {
-    esc.write(ESC_STOP);    // abrupt stop
-    Serial.println("Stopped to avoid imminent collision");
+    
+    esc.write(minSpeedOffset);
+    delay(200);
+    Serial.println("forward");
+    if (minSpeedOffset < maxSpeedOffset)
+    {
+      minSpeedOffset ++;
+        Serial.println(minSpeedOffset);
+    }
+    else
+    {
+    minSpeedOffset  = maxSpeedOffset;
+    }
+  }
+    while (stop_start == 'z' && safety_check >= IR_THRESHOLD)
+  {
+    
+    esc.write(minSpeedbackward+10);    
+    Serial.println("backward");
+    delay(200);
+    
+    if (minSpeedbackward < maxSpeedbackward)
+    {
+      minSpeedbackward ++;
+        Serial.println(minSpeedbackward);
+    }
+    else
+    {
+    minSpeedbackward  = maxSpeedbackward;
+    }
+    minSpeedOffset++;
+  }
+      while (stop_start == 'a' && safety_check >= IR_THRESHOLD)
+  {
+    esc.write(minSpeedOffset);
+    myservo.write(wheelNeutral + 25); 
+    Serial.println("left");
     delay(200);
   }
+    while (stop_start == 'd' && safety_check >= IR_THRESHOLD)
+  {
+    esc.write(minSpeedOffset);
+    myservo.write(wheelNeutral - 25); 
+    Serial.println("right");
+    delay(200);
+  }
+  //========================================================
+  
+//  while (safety_check > IR_THRESHOLD)
+//  {
+//    esc.write(ESC_STOP);    // abrupt stop
+//    Serial.println("Stopped to avoid imminent collision");
+//    delay(200);
+//  }
 }
