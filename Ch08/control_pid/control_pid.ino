@@ -37,6 +37,7 @@ int maxSpeedOffset = 60; // maximum speed magnitude, in servo 'degrees'
 int minSpeedOffset = 70; // minimum speed magnitude, in servo 'degrees'
 int minSpeedbackward = 95;
 int maxSpeedbackward =105;
+
 int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
 //set PID parameters
