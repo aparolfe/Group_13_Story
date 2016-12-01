@@ -35,6 +35,8 @@ int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 //ESC
 int maxSpeedOffset = 60; // maximum speed magnitude, in servo 'degrees'
 int minSpeedOffset = 70; // minimum speed magnitude, in servo 'degrees'
+int minSpeedbackward = 95;
+int maxSpeedbackward =105;
 int currentSpeedOffset = ESC_STOP; // start with speed 0
 int linearAcc = 4; // Rate of speed change
 //set PID parameters
@@ -274,6 +276,59 @@ void loop()
     Serial.println("Stopped because of x-bee command");
     delay(200);
   }
+
+ //=============== Manual Mode =============================
+ 
+    while (stop_start == 'w' && safety_check >= IR_THRESHOLD)
+  {
+    
+    esc.write(minSpeedOffset);
+    delay(200);
+    Serial.println("forward");
+    if (minSpeedOffset < maxSpeedOffset)
+    {
+      minSpeedOffset ++;
+        Serial.println(minSpeedOffset);
+    }
+    else
+    {
+    minSpeedOffset  = maxSpeedOffset;
+    }
+  }
+    while (stop_start == 'z' && safety_check >= IR_THRESHOLD)
+  {
+    
+    esc.write(minSpeedbackward+10);    
+    Serial.println("backward");
+    delay(200);
+    
+    if (minSpeedbackward < maxSpeedbackward)
+    {
+      minSpeedbackward ++;
+        Serial.println(minSpeedbackward);
+    }
+    else
+    {
+    minSpeedbackward  = maxSpeedbackward;
+    }
+    minSpeedOffset++;
+  }
+      while (stop_start == 'a' && safety_check >= IR_THRESHOLD)
+  {
+    esc.write(minSpeedOffset);
+    myservo.write(wheelNeutral + 25); 
+    Serial.println("left");
+    delay(200);
+  }
+    while (stop_start == 'd' && safety_check >= IR_THRESHOLD)
+  {
+    esc.write(minSpeedOffset);
+    myservo.write(wheelNeutral - 25); 
+    Serial.println("right");
+    delay(200);
+  }
+  //=======================================================
+  
 //  while (safety_check > IR_THRESHOLD)
 //  {
 //    esc.write(ESC_STOP);    // abrupt stop
