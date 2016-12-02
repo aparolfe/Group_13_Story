@@ -198,9 +198,12 @@ void forward()
 {
   turn();
   if (distance_from_obstacle_1 > 700){
-    delay(800);
+    delay(300);
     distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
     if(distance_from_obstacle_1 > 700){
+      delay(400);
+      distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+      if(distance_from_obstacle_1 > 700){
     Serial.println("about to turn");
     Serial.println("about to turn");
     Serial.println("about to turn");
@@ -210,10 +213,11 @@ void forward()
     esc.write(ESC_STOP);    // abrupt stop
     delay(500);
     esc.write(105);
-    delay(3000);
+    delay(4000);
     turn_left_90_degree();
-    delay(7000);
+    delay(6500);
   }
+    }
   }
   //speed up
 //  if (currentSpeedOffset > maxSpeedOffset) {
@@ -321,14 +325,10 @@ void loop()
     delay(200);
   }
 
- //=============== Manual Mode =============================
-
-    while (stop_start == 'w')// && safety_check >= IR_THRESHOLD)
-
 
  //=============== Manual Mode =============================
  
-    while (stop_start == 'w' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'w' )//&& safety_check >= IR_THRESHOLD)
 
   {
     
@@ -345,7 +345,7 @@ void loop()
     minSpeedOffset  = maxSpeedOffset;
     }
   }
-    while (stop_start == 'z' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'z' )//&& safety_check >= IR_THRESHOLD)
   {
     
     esc.write(minSpeedbackward+10);    
@@ -363,19 +363,19 @@ void loop()
     }
     minSpeedOffset++;
   }
-      while (stop_start == 'a' && safety_check >= IR_THRESHOLD)
+      while (stop_start == 'a' )//&& safety_check >= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
-    myservo.write(wheelNeutral + 25); 
+    myservo.write(wheelNeutral + 50); 
 
     Serial.println("left man");
     Serial.println("left");
     delay(200);
   }
-    while (stop_start == 'd' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'd' )//&& safety_check >= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
-    myservo.write(wheelNeutral - 25); 
+    myservo.write(wheelNeutral - 50); 
     Serial.println("right");
     delay(200);
   }
