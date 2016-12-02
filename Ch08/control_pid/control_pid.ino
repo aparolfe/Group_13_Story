@@ -33,8 +33,9 @@ int pos = 0;                      // Position of the servo (degress, [0, 180])
 int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 
 //ESC
-int maxSpeedOffset = 60; // maximum speed magnitude, in servo 'degrees'
-int minSpeedOffset = 70; // minimum speed magnitude, in servo 'degrees'
+
+int maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
+int minSpeedOffset = 74; // minimum speed magnitude, in servo 'degrees'
 int minSpeedbackward = 95;
 int maxSpeedbackward =105;
 
@@ -44,8 +45,9 @@ int linearAcc = 4; // Rate of speed change
 double Input_servo, Output_servo;
 double Input_speed, Output_speed;
 double Setpoint = 98;
-int Kp_servo = 2;
-int Ki_servo = 0.05;
+
+int Kp_servo = 1.7;
+int Ki_servo = 0.04;
 int Kd_servo = 0.5;
 int Kp_speed = 2;
 int Ki_speed = 0.05;
@@ -160,6 +162,13 @@ void check() {  // Interrupt to get xbee and collision sensor updates
   Serial.println(safety_check);
 }
 
+
+void turn_left_90_degree()
+{
+    esc.write(75);
+    myservo.write(180); // update the servo
+    
+}
 void setup()
 {
   Serial.begin(9600);
@@ -188,11 +197,34 @@ double radToDeg(double radians) {
 void forward()
 {
   turn();
-  //speed up
-  if (currentSpeedOffset > maxSpeedOffset) {
-    currentSpeedOffset = currentSpeedOffset - linearAcc;
-    esc.write(currentSpeedOffset);
+  if (distance_from_obstacle_1 > 700){
+    delay(300);
+    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+    if(distance_from_obstacle_1 > 700){
+      delay(400);
+      distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+      if(distance_from_obstacle_1 > 700){
+    Serial.println("about to turn");
+    Serial.println("about to turn");
+    Serial.println("about to turn");
+    Serial.println("about to turn");
+    Serial.println("about to turn");
+
+    esc.write(ESC_STOP);    // abrupt stop
+    delay(500);
+    esc.write(105);
+    delay(4000);
+    turn_left_90_degree();
+    delay(6500);
   }
+    }
+  }
+  //speed up
+//  if (currentSpeedOffset > maxSpeedOffset) {
+//    currentSpeedOffset = currentSpeedOffset - linearAcc;
+//    esc.write(currentSpeedOffset);
+//  }
+  esc.write(maxSpeedOffset);
   delay(INTERVAL);
   Serial.println("forward Mode");
 }
@@ -209,6 +241,9 @@ void turn()
   Input_servo = min_distance_to_wall;
   myPID_servo.Compute();
   myservo.write(wheelNeutral + Output_servo); // update the servo
+  if (distance_from_obstacle_1 > 700){
+    return;
+  }
   if (distance_from_obstacle_1 < distance_from_obstacle_2) // keep track of the closer wheel to the wall
   {
     Serial.println("leftTurn Mode");
@@ -239,7 +274,7 @@ void track_wall()  // used if the car far from the walls
   {
     wheel = "right_wheel";
   }
-  delay(200);
+  delay(50);
 }
 
 void swerve()    // used if the car is too close to a wall and should turn away from the wall
@@ -261,16 +296,28 @@ void swerve()    // used if the car is too close to a wall and should turn away 
 void loop()
 {
   //int turn_angle = 0;       // local counter for turn degree
+  distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
   forward();                // car moves forward continuously
-  while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall >= BOUNDARY) // if far enough from both walls, keep going
+  while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall >= BOUNDARY && distance_from_obstacle_1 < 700) // if far enough from both walls, keep going
   {
     forward();
     track_wall();
+    //distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+
   }
-  while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall < BOUNDARY) // if too close to a wall, turn away from wall
+  while (stop_start == '1' && safety_check <= IR_THRESHOLD && min_distance_to_wall < BOUNDARY && distance_from_obstacle_1 < 700) // if too close to a wall, turn away from wall
   {
+    //distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
     swerve();
   }
+//  while (stop_start == '1' && safety_check <= IR_THRESHOLD && distance_from_obstacle_1 > 700)
+//  {
+//    esc.write(ESC_STOP);    // abrupt stop
+//    delay(2000);
+//    Serial.println("about to turn");
+//    turn_left_90_degree();
+//    delay(2000);
+//  }
   while (stop_start == '0')
   {
     esc.write(ESC_STOP);    // abrupt stop
@@ -278,9 +325,11 @@ void loop()
     delay(200);
   }
 
+
  //=============== Manual Mode =============================
  
-    while (stop_start == 'w' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'w' )//&& safety_check >= IR_THRESHOLD)
+
   {
     
     esc.write(minSpeedOffset);
@@ -296,7 +345,7 @@ void loop()
     minSpeedOffset  = maxSpeedOffset;
     }
   }
-    while (stop_start == 'z' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'z' )//&& safety_check >= IR_THRESHOLD)
   {
     
     esc.write(minSpeedbackward+10);    
@@ -314,20 +363,25 @@ void loop()
     }
     minSpeedOffset++;
   }
-      while (stop_start == 'a' && safety_check >= IR_THRESHOLD)
+      while (stop_start == 'a' )//&& safety_check >= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
-    myservo.write(wheelNeutral + 25); 
+    myservo.write(wheelNeutral + 50); 
+
+    Serial.println("left man");
     Serial.println("left");
     delay(200);
   }
-    while (stop_start == 'd' && safety_check >= IR_THRESHOLD)
+    while (stop_start == 'd' )//&& safety_check >= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
-    myservo.write(wheelNeutral - 25); 
+    myservo.write(wheelNeutral - 50); 
     Serial.println("right");
     delay(200);
   }
+
+  
+/////////////////////////////////////////////////////////
   //========================================================
   
 //  while (safety_check > IR_THRESHOLD)
