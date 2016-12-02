@@ -127,7 +127,9 @@ io.on('connection', function(socket){
     console.log('a user connected');
     socket.on('update',function(msg){
 	console.log(msg);
-	arduinoSerial.write(msg);
+	if ("01wadz".includes(msg)) {	// input validation
+	    arduinoSerial.write(msg);
+	}
     });
 });
 
