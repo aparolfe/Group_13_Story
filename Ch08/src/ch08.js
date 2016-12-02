@@ -1,24 +1,21 @@
 //var socket = io();
 
 $(window).keypress(function(event) {
-    //socket.emit('keypress',event.keyCode)
-    console.log(event.keyCode);
+    var keypressed = String.fromCharCode(event.keyCode);
+    socket.emit('update',keypressed);
+    console.log(keypressed);
     switch (event.keyCode) {
     case 97:
 	left();
-    	console.log(event.keyCode);
        	break;
     case 119:
         up();
-    	console.log(event.keyCode);
         break;
     case 100:
         right();
-    	console.log(event.keyCode);
         break;
     case 115:
         down();
-    	console.log(event.keyCode);
         break;
     }
 
