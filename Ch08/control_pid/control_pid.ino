@@ -210,9 +210,7 @@ void forward()
     if(distance_from_obstacle_1 > 700){
     Serial.println("about to turn");
     Serial.println("about to turn");
-    Serial.println("about to turn");
-    Serial.println("about to turn");
-    Serial.println("about to turn");
+
 
     esc.write(ESC_STOP);    // abrupt stop
     delay(500);
@@ -287,8 +285,6 @@ void swerve()    // used if the car is too close to a wall and should turn away 
     delay(100);
     distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
     if(distance_from_obstacle_1 > 700){
-    Serial.println("about to turn");
-    Serial.println("about to turn");
     Serial.println("about to turn");
     Serial.println("about to turn");
     Serial.println("about to turn");
@@ -375,8 +371,7 @@ void loop()
     delay(2000);
     Serial.println("about to back");
     Serial.println("about to back");
-    Serial.println("about to back");
-    Serial.println("about to back");
+
     esc.write(100);
     delay(2000);
     esc.write(ESC_STOP);
@@ -413,8 +408,7 @@ void loop()
     delay(2000);
     Serial.println("about to fffback");
     Serial.println("about to fffback");
-    Serial.println("about to fffback");
-    Serial.println("about to fffback");
+
     esc.write(80);
     delay(2000);
     esc.write(ESC_STOP);
