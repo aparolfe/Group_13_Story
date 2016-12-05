@@ -14,7 +14,7 @@ console.log(data.length);
 console.log(bin.length);
 
 var binmap= {};
-bin.forEach(function(entry) {
+bin.forEach(function(entry) { // maps bin to x,y location for website
     var x,y;
     if (entry < 19)
     { x = 7;
@@ -42,7 +42,7 @@ var xbee_11_rssi = 0;
 var xbee_12_rssi = 0;
 var xbee_13_rssi = 0;
 var xbee_14_rssi = 0;
-var rssi_total =[];
+var rssi_total =[xbee_11_rssi,xbee_12_rssi,xbee_13_rssi,xbee_14_rssi];
 var C = xbee_api.constants;
 var XBeeAPI = new xbee_api.XBeeAPI({
     api_mode: 2
@@ -128,11 +128,19 @@ var knn = new ml.KNN({
 
 function predict_and_send(){
     console.log(rssi_total);
-    bin_predicted= predict(rssi_total, knn);
-    console.log(bin_predicted);
-    console.log(binmap[bin_predicted]);
-    // io.emit('data',{x:x_predicted,y:y_predicted});
-    io.emit('data',{x:binmap[bin_predicted][0], y:binmap[bin_predicted][1]});
+    if (rssi_total.indexOf(0) == -1 && rssi_total.indexOf(255) == -1) { // if we have good data from all beacons
+	bin_predicted= predict(rssi_total, knn);	//predict bin, then clear values
+	xbee_11_rssi = 0;
+	xbee_12_rssi = 0;
+	xbee_13_rssi = 0;
+	xbee_14_rssi = 0;
+	console.log(bin_predicted);
+	if (bin_predicted in binmap) {	// only update website if prediction is valid
+	    var location = binmap[bin_predicted];
+	    console.log(location);
+	    io.emit('data',{x:location[0], y:location[1]});
+	}
+    }
 }
 setInterval(predict_and_send, rssiDelay);
 
