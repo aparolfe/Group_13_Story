@@ -1,5 +1,3 @@
-//var socket = io();
-
 $(window).keypress(function(event) {
     var keypressed = String.fromCharCode(event.keyCode);
     socket.emit('update',keypressed);
@@ -47,4 +45,7 @@ function right(){
         $('#down').css("color","black");
         $('#left').css("color","black");
         $('#right').css("color","green");
+
+$('.bton').click(function(){
+	
 }

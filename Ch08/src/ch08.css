@@ -38,3 +38,16 @@ body { padding-top: 50px; }
 
 #left{float:left; padding-left:100px;}
 #right{float:right; padding-right:100px;}
+
+input[type=button] {
+      border-radius: 17px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 150%;
+      background: green;
+      padding: 10px 20px 10px 20px;
+      margin:10px;
+      width: 150px;
+      height: 80px;
+      text-decoration: none;
+      }
