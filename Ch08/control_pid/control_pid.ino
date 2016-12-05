@@ -4,9 +4,9 @@
 #include <PID_v1.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      110      // Avoid objects closer than 30cm.
-#define IR_THRESHOLD  160     // Max acceptable reading of front collision sensor
-#define IR_THRESHOLD_2  180     // Max acceptable reading of front collision sensor
+#define BOUNDARY      98      // Avoid objects closer than 30cm.
+#define IR_THRESHOLD  100     // Max acceptable reading of front collision sensor
+#define IR_THRESHOLD_2  150     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
 
 // Tracking all used pins
@@ -37,8 +37,8 @@ int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 
 //ESC
 
-int maxSpeedOffset = 76; // maximum speed magnitude, in servo 'degrees'
-int minSpeedOffset = 78; // minimum speed magnitude, in servo 'degrees'
+int maxSpeedOffset = 73; // maximum speed magnitude, in servo 'degrees'
+int minSpeedOffset = 77; // minimum speed magnitude, in servo 'degrees'
 int minSpeedbackward = 95;
 int maxSpeedbackward =100;
 int minSpeedOffset_1;
@@ -122,7 +122,7 @@ int lidarGetDistance(int sensorNumber)   // Get a measurement from the LIDAR Lit
     else Serial.print("right:");
     Serial.println(pulse_width);              // Print the distance
     return pulse_width;
-    delay(10);
+    delay(40);
   }
 }
 
@@ -172,8 +172,23 @@ void check() {  // Interrupt to get xbee and collision sensor updates
 
 void turn_left_90_degree()
 {
+    if (distance_from_obstacle_1 > 1000){
+    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
+    if (distance_from_obstacle_1 > 1000){
+    Serial.println("about to turn");
+    Serial.println("about to turn");
+    esc.write(ESC_STOP);    // abrupt stop
+    delay(500);
+    esc.write(105);
+    delay(1500);
     esc.write(75);
     myservo.write(180); // update the servo
+    delay(5150);
+  
+    
+  }
+  }
+    
     
 }
 void setup()
@@ -204,19 +219,18 @@ double radToDeg(double radians) {
 void forward()
 {
   turn();
-  if (distance_from_obstacle_1 > 300){
+  turn_left_90_degree();
+  if (distance_from_obstacle_1 > 800){
     distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
     if (distance_from_obstacle_1 > 1000){
     Serial.println("about to turn");
     Serial.println("about to turn");
-
-
     esc.write(ESC_STOP);    // abrupt stop
     delay(500);
     esc.write(105);
-    delay(1800);
+    delay(2200);
     turn_left_90_degree();
-    delay(4700);
+    delay(5000);
   
     
   }
@@ -240,6 +254,7 @@ void turn()
 //  }
 //  myPID_speed.Compute();
 //  esc.write(wheelNeutral + Output_speed); // update the esc
+  turn_left_90_degree();
   Input_servo = min_distance_to_wall;
   myPID_servo.Compute();
   myservo.write(wheelNeutral + Output_servo); // update the servo
@@ -276,30 +291,17 @@ void track_wall()  // used if the car far from the walls
   {
     wheel = "right_wheel";
   }
+  turn_left_90_degree();
   delay(30);
 }
 
 void swerve()    // used if the car is too close to a wall and should turn away from the wall
 { 
-    if (distance_from_obstacle_1 > 800){
-    delay(100);
-    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-    if(distance_from_obstacle_1 > 700){
-    Serial.println("about to turn");
-    Serial.println("about to turn");
-    Serial.println("about to turn");
 
-    esc.write(ESC_STOP);    // abrupt stop
-    delay(500);
-    esc.write(105);
-    delay(4000);
-    turn_left_90_degree();
-    delay(6500);
   
-    }
-  }
   Serial.println("Swerving");
   track_wall();
+  turn_left_90_degree();
   if (wheel == "left_wheel")
   {
     Serial.println("close to left wall");
@@ -347,7 +349,7 @@ void loop()
 //    turn_left_90_degree();
 //    delay(2000);
 //  }
-  while (stop_start == '0')
+  while (stop_start == '0' )
   {
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped because of x-bee command");
@@ -357,22 +359,19 @@ void loop()
 
  //=============== Manual Mode =============================
  
-    while (stop_start == 'w' )//z
+    while (stop_start == 'w')//z
    // && safety_check <= IR_THRESHOLD)
 
   {
-    
-
     myservo.write(wheelNeutral); 
-
-    while(safety_check >= IR_THRESHOLD){
+    while(safety_check >= 150){
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid foward collision");
     delay(2000);
     Serial.println("about to back");
     Serial.println("about to back");
 
-    esc.write(100);
+    esc.write(105);
     delay(2000);
     esc.write(ESC_STOP);
     delay(2000);
@@ -381,21 +380,10 @@ void loop()
     }
     delay(200);
     Serial.println("forward");
-    minSpeedOffset_1 = minSpeedOffset;
-    if (minSpeedOffset_1 > maxSpeedOffset)
-    {
-      minSpeedOffset_1 --;
-        Serial.println(minSpeedOffset_1);
-    esc.write(minSpeedOffset_1 + 8);
+    
+    esc.write(minSpeedOffset -3);
 
     }
-    else
-    {
-    minSpeedOffset_1  = maxSpeedOffset;
-    esc.write(minSpeedOffset_1 + 8);
-    
-    }
-  }
     while (stop_start == 'z'){
     myservo.write(wheelNeutral); 
     esc.write(100);  
@@ -428,7 +416,7 @@ void loop()
   }
       while (stop_start == 'a' && safety_check <= IR_THRESHOLD)
   {
-    esc.write(minSpeedOffset +10);
+    esc.write(minSpeedOffset);
     myservo.write(wheelNeutral + 40); 
     while(safety_check >= IR_THRESHOLD){
     esc.write(ESC_STOP);    // abrupt stop
@@ -441,7 +429,7 @@ void loop()
   }
     while (stop_start == 'd' && safety_check <= IR_THRESHOLD)
   {
-    esc.write(minSpeedOffset +10);
+    esc.write(minSpeedOffset);
     while(safety_check >= IR_THRESHOLD){
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid right collision");
@@ -456,10 +444,11 @@ void loop()
 /////////////////////////////////////////////////////////
   //========================================================
   
-//  while (safety_check > IR_THRESHOLD )//|| safety_check_2 > IR_THRESHOLD)
-//{
-//    esc.write(ESC_STOP);    // abrupt stop
-//    Serial.println("Stopped to avoid imminent collision");
-//    delay(200);
-//  }
+  while (safety_check > IR_THRESHOLD ||  stop_start != 'w')//|| safety_check_2 > IR_THRESHOLD)
+{   
+    esc.write(ESC_STOP);    // abrupt stop
+    Serial.println("Stopped to avoid imminent collision");
+    delay(2000);
+  
+}
 }
