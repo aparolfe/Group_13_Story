@@ -4,7 +4,7 @@
 #include <PID_v1.h>
 
 #define INTERVAL      50      // (ms) Interval between distance readings.
-#define BOUNDARY      98      // Avoid objects closer than 30cm.
+#define BOUNDARY      110      // Avoid objects closer than 30cm.
 #define IR_THRESHOLD  160     // Max acceptable reading of front collision sensor
 #define IR_THRESHOLD_2  180     // Max acceptable reading of front collision sensor
 #define ESC_STOP      90      // Neutral ("Stop") value for ESC
@@ -37,7 +37,7 @@ int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 
 //ESC
 
-int maxSpeedOffset = 73; // maximum speed magnitude, in servo 'degrees'
+int maxSpeedOffset = 76; // maximum speed magnitude, in servo 'degrees'
 int minSpeedOffset = 78; // minimum speed magnitude, in servo 'degrees'
 int minSpeedbackward = 95;
 int maxSpeedbackward =100;
@@ -122,7 +122,7 @@ int lidarGetDistance(int sensorNumber)   // Get a measurement from the LIDAR Lit
     else Serial.print("right:");
     Serial.println(pulse_width);              // Print the distance
     return pulse_width;
-    delay(1);
+    delay(10);
   }
 }
 
@@ -204,10 +204,9 @@ double radToDeg(double radians) {
 void forward()
 {
   turn();
-  if (distance_from_obstacle_1 > 800){
-    delay(100);
+  if (distance_from_obstacle_1 > 300){
     distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-    if(distance_from_obstacle_1 > 700){
+    if (distance_from_obstacle_1 > 1000){
     Serial.println("about to turn");
     Serial.println("about to turn");
 
@@ -215,11 +214,12 @@ void forward()
     esc.write(ESC_STOP);    // abrupt stop
     delay(500);
     esc.write(105);
-    delay(2500);
+    delay(1800);
     turn_left_90_degree();
-    delay(6500);
+    delay(4700);
   
-    }
+    
+  }
   }
   //speed up
 //  if (currentSpeedOffset > maxSpeedOffset) {
@@ -227,7 +227,7 @@ void forward()
 //    esc.write(currentSpeedOffset);
 //  }
   esc.write(maxSpeedOffset);
-  delay(INTERVAL);
+  delay(30);
   Serial.println("forward Mode");
 }
 
@@ -276,7 +276,7 @@ void track_wall()  // used if the car far from the walls
   {
     wheel = "right_wheel";
   }
-  delay(50);
+  delay(30);
 }
 
 void swerve()    // used if the car is too close to a wall and should turn away from the wall
@@ -309,7 +309,7 @@ void swerve()    // used if the car is too close to a wall and should turn away 
   { Serial.println("close to right wall");
     turn();      // turn left
   }
-  delay(INTERVAL);                // Delay between readings.
+  delay(30);                // Delay between readings.
 }
 
 void loop()
