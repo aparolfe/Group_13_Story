@@ -9,7 +9,10 @@
     text-align:center;
     margin: -5px;
 }
-
+body { padding-top: 50px; }
+.navbar{
+	background-color: purple;
+}
 #chart {
     background-image:url("map.png");
     background-repeat: no-repeat;
@@ -17,7 +20,9 @@
     width: 420px;
     height: 530px;
     margin:auto;
+    float: right;
     margin-top: 20px;
+    padding: 100px 100px 100px 100px;
 }
 
 #plot {
@@ -26,3 +31,10 @@
     margin-left:5px;
     padding-top:25px;
 }
+
+#controls {
+	padding: 50px 50px 50px 50px;
+}
+
+#left{float:left; padding-left:100px;}
+#right{float:right; padding-right:100px;}
