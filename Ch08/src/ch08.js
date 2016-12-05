@@ -14,7 +14,7 @@ $(window).keypress(function(event) {
     case 100:
         right();
         break;
-    case 115:
+    case 122:
         down();
         break;
     }
