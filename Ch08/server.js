@@ -8,9 +8,28 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http); 
 app.use(express.static('src'));
 // Knn Data load
-var data = require('./trainingData.js');
-var y_result = require('./xResult.js');
-var x_result = require('./yResult.js');
+var data = require('./knnTrainingSet.js');
+var bin = require('./binResult.js');
+console.log(data.length);
+console.log(bin.length);
+
+var binmap= {};
+bin.forEach(function(entry) {
+    var x,y;
+    if (entry < 19)
+    { x = 7;
+      y = entry+1; }
+    else if (entry < 22)
+    { x = 7 - 1.5*(entry-18);
+      y = 19; }
+    else if (entry < 41)
+    { x = 1;
+      y = 41 - entry; }
+    else
+    { x = 1+ 1.5 * (entry - 40)
+      y = 1; }
+    binmap[entry] = [x,y];
+});
 
 // command line args setup
 // command line syntax: node server.js xbeePort arduinoPort webcamPort
@@ -44,7 +63,7 @@ var webcamPortConfig = {
 
 var xbeeSerial, arduinoSerial, webcamSerial;
 xbeeSerial = new SerialPort.SerialPort(xbeePort, xbeePortConfig);
-arduinoSerial = new SerialPort.SerialPort(arduinoPort, arduinoPortConfig);
+//arduinoSerial = new SerialPort.SerialPort(arduinoPort, arduinoPortConfig);
 //webcamSerial = new SerialPort.SerialPort(webcamPort, webcamPortConfig);
 
 var RSSIRequestPacket = {
@@ -79,7 +98,7 @@ XBeeAPI.on("frame_object", function(frame) {
 	//console.log(rssi_total);
     }
 });
-
+/*
 arduinoSerial.on("open", function () {
     console.log('arduino serial open');
 });
@@ -90,8 +109,7 @@ arduinoSerial.on("open", function () {
 */
 
 // Knn Logic
-var x_predicted = 0;
-var y_predicted = 0;
+var bin_predicted = 0;
 
 function predict(input,knn){
     var predicted = knn.predict({
@@ -103,22 +121,18 @@ function predict(input,knn){
     return predicted;
 };
 
-var x_knn = new ml.KNN({
+var knn = new ml.KNN({
     data : data,
-    result : x_result
-});
-
-var y_knn = new ml.KNN({
-    data : data,
-    result : y_result
+    result : bin
 });
 
 function predict_and_send(){
     console.log(rssi_total);
-    x_predicted= predict(rssi_total,x_knn);
-    y_predicted = predict(rssi_total,y_knn);
-    console.log(x_predicted,y_predicted);
-    io.emit('data',{x:x_predicted,y:y_predicted});        
+    bin_predicted= predict(rssi_total, knn);
+    console.log(bin_predicted);
+    console.log(binmap[bin_predicted]);
+    // io.emit('data',{x:x_predicted,y:y_predicted});
+    io.emit('data',{x:binmap[bin_predicted][0], y:binmap[bin_predicted][1]});
 }
 setInterval(predict_and_send, rssiDelay);
 
@@ -127,7 +141,9 @@ io.on('connection', function(socket){
     console.log('a user connected');
     socket.on('update',function(msg){
 	console.log(msg);
-	arduinoSerial.write(msg);
+	if ("01wadz".includes(msg)) {	// input validation
+//	    arduinoSerial.write(msg);
+	}
     });
 });
 
