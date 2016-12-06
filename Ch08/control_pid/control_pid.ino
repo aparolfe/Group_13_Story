@@ -364,7 +364,7 @@ void loop()
 
   {
     myservo.write(wheelNeutral); 
-    while(safety_check >= 150){
+    while(safety_check >= 130){
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid foward collision");
     delay(2000);
@@ -375,8 +375,6 @@ void loop()
     delay(2000);
     esc.write(ESC_STOP);
     delay(2000);
-
-    
     }
     delay(200);
     Serial.println("forward");
@@ -387,7 +385,6 @@ void loop()
     while (stop_start == 'z'){
     myservo.write(wheelNeutral); 
     esc.write(100);  
-     delay(2000);  
     Serial.println("backward");
     
     while(safety_check_2 >= IR_THRESHOLD){
@@ -413,27 +410,45 @@ void loop()
 //    minSpeedbackward  = maxSpeedbackward;
 //    }
 //    minSpeedOffset++;
+       delay(200);  
   }
-      while (stop_start == 'a' && safety_check <= IR_THRESHOLD)
+
+      while (stop_start == 'a')// && safety_check <= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
     myservo.write(wheelNeutral + 40); 
-    while(safety_check >= IR_THRESHOLD){
+    
+   while(safety_check >= 130){
     esc.write(ESC_STOP);    // abrupt stop
-    Serial.println("Stopped to avoid left collision");
-    delay(200);
+    Serial.println("Stopped to avoid foward collision");
+    delay(2000);
+    Serial.println("about to back");
+    Serial.println("about to back");
+
+    esc.write(105);
+     myservo.write(wheelNeutral);
+    delay(2000);
+    esc.write(ESC_STOP);
+    delay(4000);
     }
-    Serial.println("left man");
-    Serial.println("left");
     delay(200);
-  }
-    while (stop_start == 'd' && safety_check <= IR_THRESHOLD)
+   }
+    while (stop_start == 'd')// && safety_check <= IR_THRESHOLD)
   {
     esc.write(minSpeedOffset);
-    while(safety_check >= IR_THRESHOLD){
+    while(safety_check >= 130){
     esc.write(ESC_STOP);    // abrupt stop
-    Serial.println("Stopped to avoid right collision");
-    delay(200);
+    Serial.println("Stopped to avoid foward collision");
+    delay(2000);
+    Serial.println("about to back");
+    Serial.println("about to back");
+
+    esc.write(105);
+    myservo.write(wheelNeutral);
+    delay(2000);
+    esc.write(ESC_STOP);
+    delay(4000);
+
     }
     myservo.write(wheelNeutral - 40); 
     Serial.println("right");
@@ -444,11 +459,12 @@ void loop()
 /////////////////////////////////////////////////////////
   //========================================================
   
-  while (safety_check > IR_THRESHOLD ||  stop_start != 'w')//|| safety_check_2 > IR_THRESHOLD)
+  while (safety_check > IR_THRESHOLD &&  stop_start == '1' )//|| safety_check_2 > IR_THRESHOLD)
 {   
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid imminent collision");
     delay(2000);
-  
+ 
 }
-}
+
+} // Main loop
