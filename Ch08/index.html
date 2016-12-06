@@ -3,32 +3,33 @@
     <title>Challenge 8 -Group 13</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="ch08.css">
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="src/ch08.css">
+    <link rel="stylesheet" type="text/css" href="src/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="src/bootstrap/css/bootstrap-theme.min.css">
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top"><div class="navbar-header header"> EC544 Group 13 Challenge 8 Page </div></nav>
     <div class="container">
-	<div class="row" id="controls">
-		<div class="col-md-6">
-    			<div class="row" id ="livevideo"><embed src="http://192.168.1.117:8080/stream_simple.html/img" width="700" height="500" scrolling="no"</embed></div>
-			<div class="row" align="center"><i class="fa fa-arrow-circle-up" id="up" style="font-size:100px"></i></div>
-			<div class="row" align="center"><i class="fa fa-arrow-circle-left" id="left" style="font-size:100px"></i><i class="fa fa-arrow-circle-right" id="right" style="font-size:100px"></i></div>
-			<div class="row" align="center"><i class="fa fa-arrow-circle-down" id="down" style="font-size:100px"></i></div>
+    	<div class="row">
+    		<div class="col-md-6"><embed src="http://192.168.1.117:8080/stream_simple.html/img" width="700" height="500" scrolling="no"</embed></div><!--col-md-6 controls div-->
+            <div class="col-md-6"><div id="chart"><div id="plot"></div></div></div>
+    	</div>
+        <div class="row" id="bottom">
+            <div class="col-md-6">	
+            <div class="row" align="center"><i class="fa fa-arrow-circle-up" id="up" style="font-size:90px"></i></div>
+			<div class="row" align="center"><i class="fa fa-arrow-circle-left" id="left" style="font-size:90px"></i><i class="fa fa-arrow-circle-right" id="right" style="font-size:90px"></i></div>
+			<div class="row" align="center"><i class="fa fa-arrow-circle-down" id="down" style="font-size:90px"></i></div>
 			<div class="row" style="height:50px;"></div>
-			<div class="row" align="center"><input type="button" class="bton" id=control value="START"></div>
-		</div><!--col-md-6 controls div-->
-		
-		<div class="col-md-6"><div id="chart"><div id="plot"></div></div></div>
-	</div> <!--class row-->
-	
-	<div id ="buttons"></div>
+            </div>
+    		<div class="col-md-6">
+    			<div class="row" align="center"><input type="button" class="bton" id=control style="background:green" value="START"><input type="button" class="bton" id=mode style="background:blue" value="MANUAL"></div>
+            </div>
+    	</div> <!--class row-->
     </div>
-	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-	<script src="localize.js"></script>
-	<script src="ch08.js"></script>
+	<script src="src/bootstrap/js/bootstrap.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
+	<script src="src/localize.js"></script>
+	<script src="src/ch08.js"></script>
     </body>
 </html>

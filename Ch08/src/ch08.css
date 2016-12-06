@@ -36,18 +36,18 @@ body { padding-top: 50px; }
 	padding: 50px 50px 50px 50px;
 }
 
-#left{float:left; padding-left:100px;}
-#right{float:right; padding-right:100px;}
+#left{float:left; padding-left:120px;}
+#right{float:right; padding-right:120px;}
 
 input[type=button] {
       border-radius: 17px;
       font-family: Georgia;
       color: #ffffff;
       font-size: 150%;
-      background: green;
       padding: 10px 20px 10px 20px;
       margin:10px;
       width: 150px;
       height: 80px;
       text-decoration: none;
       }
+#bottom{padding: 50px 20px 20px 20px;}
