@@ -8,12 +8,15 @@ $(window).keypress(function(event) {
        	break;
     case 119:
         up();
+        manual();
         break;
     case 100:
         right();
+        manual();
         break;
     case 122:
         down();
+        manual();
         break;
     case 13:
         $('#control').click();
@@ -22,10 +25,7 @@ $(window).keypress(function(event) {
         $('#mode').click();
         break;
     }
-
 });
-
-
 
 function up(){
 	$('#up').css("color","green");	
@@ -53,7 +53,6 @@ function right(){
         $('#down').css("color","black");
         $('#left').css("color","black");
         $('#right').css("color","green");
-}
 
 function start(){
     $('#control').val("START");
@@ -63,18 +62,21 @@ function start(){
 function stop(){
     $('#control').val("STOP");
     $('#control').css("background-color","red");
+    $('#up').css("color","black");  
+    $('#down').css("color","black");
+    $('#left').css("color","black");
+    $('#right').css("color","black");
     socket.emit('control',0);  }
 
 function auto(){
     $('#mode').val("AUTO");
     $('#mode').css("background-color","purple");
-    socket.emit('mode',1); }
+    socket.emit('control',1); }
 
 function manual(){
     $('#mode').val("MANUAL");
     $('#mode').css("background-color","blue");
-    socket.emit('mode',0); }
-
+//    socket.emit('mode',0); }
 
 $('.bton').click(function(){
     var value = $(this).val();
@@ -84,6 +86,6 @@ $('.bton').click(function(){
         start();}
     else if(value == "MANUAL"){
         auto();}
-    else if(value == "AUTO"){
-        manual();}	
+//    else if(value == "AUTO"){
+//        manual();}	
 });
