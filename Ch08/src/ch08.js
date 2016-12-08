@@ -3,26 +3,33 @@ $(window).keypress(function(event) {
     socket.emit('update',keypressed);
     console.log(keypressed);
     switch (event.keyCode) {
-    case 97:
-	left();
+    case 97: //KEY: A
+	    left();
+        manual();
        	break;
-    case 119:
+    case 119: //KEY: W
         up();
         manual();
         break;
-    case 100:
+    case 100: //KEY: D
         right();
         manual();
         break;
-    case 122:
+    case 122: //KEY: Z
         down();
         manual();
         break;
-    case 13:
+    case 13: //ENTER
         $('#control').click();
         break;
-    case 32:
+    case 32: //SPACE
         $('#mode').click();
+        break;
+    case 49: //The number 1
+        auto();
+        break;
+    case 48: //the number 0
+        stop();
         break;
     }
 });
