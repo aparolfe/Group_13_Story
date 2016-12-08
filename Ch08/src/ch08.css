@@ -20,16 +20,14 @@ body { padding-top: 50px; }
     width: 420px;
     height: 530px;
     margin:auto;
-    float: right;
     margin-top: 20px;
-    padding: 100px 100px 100px 100px;
 }
 
 #plot {
     width: 410px;
-    height: 510px;
+    height: 530px;
     margin-left:5px;
-    padding-top:25px;
+    padding-top:40px;
 }
 
 #controls {
