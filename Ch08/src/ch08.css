@@ -1,0 +1,52 @@
+.header {
+    height:60px;
+    background: #4a148c;
+    width:100%;
+    padding:5px;
+    font-family: Georgia;
+    color: #ffffff;
+    font-size: 36px;
+    text-align:center;
+    margin: -5px;
+}
+body { padding-top: 50px; }
+.navbar{
+	background-color:  #4a148c;
+}
+#chart {
+    background-image:url("map.png");
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    width: 420px;
+    height: 530px;
+    margin:auto;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+#plot {
+    width: 410px;
+    height: 550px;
+    margin-left:5px;
+    padding-top:12px;
+}
+
+#controls {
+	padding: 0px 50px 50px 50px;
+}
+
+#left{float:left; padding-left:120px;}
+#right{float:right; padding-right:120px;}
+
+input[type=button] {
+      border-radius: 17px;
+      font-family: Georgia;
+      color: #ffffff;
+      font-size: 150%;
+      padding: 10px 20px 10px 20px;
+      margin:10px;
+      width: 150px;
+      height: 80px;
+      text-decoration: none;
+      }
+#bottom{padding: 50px 20px 20px 20px;}
