@@ -1,6 +1,6 @@
 .header {
     height:60px;
-    background:purple;
+    background: #4a148c;
     width:100%;
     padding:5px;
     font-family: Georgia;
@@ -11,7 +11,7 @@
 }
 body { padding-top: 50px; }
 .navbar{
-	background-color: purple;
+	background-color:  #4a148c;
 }
 #chart {
     background-image:url("map.png");
@@ -20,20 +20,19 @@ body { padding-top: 50px; }
     width: 420px;
     height: 530px;
     margin:auto;
-    float: right;
     margin-top: 20px;
-    padding: 100px 100px 100px 100px;
+    margin-bottom: 30px;
 }
 
 #plot {
     width: 410px;
-    height: 510px;
+    height: 550px;
     margin-left:5px;
-    padding-top:25px;
+    padding-top:12px;
 }
 
 #controls {
-	padding: 50px 50px 50px 50px;
+	padding: 0px 50px 50px 50px;
 }
 
 #left{float:left; padding-left:120px;}
