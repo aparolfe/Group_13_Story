@@ -14,7 +14,7 @@ var options = {
     },
     vAxis: {
 	minValue: 0,
-	maxValue: 21,
+	maxValue: 11,
 	textPosition: 'none',
 	baselineColor: 'white',
 	gridlines: {count:0},

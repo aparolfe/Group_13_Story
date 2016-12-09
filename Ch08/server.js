@@ -1,4 +1,5 @@
 // Required modules
+var moment = require('moment');
 var SerialPort = require("serialport");
 var express=require('express');
 var app = express();
@@ -10,23 +11,20 @@ app.use(express.static('src'));
 // Knn Data load
 var data = require('./knnTrainingSet.js');
 var bin = require('./binResult.js');
-console.log(data.length);
-console.log(bin.length);
-
 var binmap= {};
 bin.forEach(function(entry) { // maps bin to x,y location for website
     var x,y;
-    if (entry < 19)
+    if (entry < 10)
     { x = 7;
       y = entry+1; }
-    else if (entry < 22)
-    { x = 7 - 1.5*(entry-18);
-      y = 19; }
-    else if (entry < 41)
+    else if (entry < 14)
+    { x = 7 - 1.5*(entry-9);
+      y = 10; }
+    else if (entry < 23)
     { x = 1;
-      y = 41 - entry; }
+      y = 23 - entry; }
     else
-    { x = 1+ 1.5 * (entry - 40)
+    { x = 1+ 1.5 * (entry - 22)
       y = 1; }
     binmap[entry] = [x,y];
 });
@@ -35,7 +33,6 @@ bin.forEach(function(entry) { // maps bin to x,y location for website
 // command line syntax: node server.js xbeePort arduinoPort webcamPort
 var xbeePort = process.argv[2];
 var arduinoPort = process.argv[3];
-var webcamPort = process.argv[4];
 
 // xbee beacon communication setup
 var xbee_11_rssi = 0;
@@ -57,14 +54,10 @@ var xbeePortConfig = {
 var arduinoPortConfig = {
     baudRate: 9600
 };
-var webcamPortConfig = {
-    baudRate: 9600
-};
 
-var xbeeSerial, arduinoSerial, webcamSerial;
+var xbeeSerial, arduinoSerial;
 xbeeSerial = new SerialPort.SerialPort(xbeePort, xbeePortConfig);
 //arduinoSerial = new SerialPort.SerialPort(arduinoPort, arduinoPortConfig);
-//webcamSerial = new SerialPort.SerialPort(webcamPort, webcamPortConfig);
 
 var RSSIRequestPacket = {
     type: C.FRAME_TYPE.ZIGBEE_TRANSMIT_REQUEST,
@@ -95,21 +88,14 @@ XBeeAPI.on("frame_object", function(frame) {
 	if (frame.data[1] == 14)
 	{ xbee_14_rssi = frame.data[0];}
 	rssi_total =[xbee_11_rssi,xbee_12_rssi,xbee_13_rssi,xbee_14_rssi];
-	//console.log(rssi_total);
     }
 });
 /*
 arduinoSerial.on("open", function () {
     console.log('arduino serial open');
-});
-
-/*webcamSerial.on("open", function () {
-    console.log('webcam serial open');
-}); 
-*/
+}); */
 
 // Knn Logic
-var bin_predicted = 0;
 
 function predict(input,knn){
     var predicted = knn.predict({
@@ -126,19 +112,30 @@ var knn = new ml.KNN({
     result : bin
 });
 
+var binPredicted = 0;
+var lastPredTime = 0;
+var lastPrediction = 0;
+var crawlerSpeed = 3000; //units ms/bin
 function predict_and_send(){
     console.log(rssi_total);
     if (rssi_total.indexOf(0) == -1 && rssi_total.indexOf(255) == -1) { // if we have good data from all beacons
-	bin_predicted= predict(rssi_total, knn);	//predict bin, then clear values
+	binPredicted= predict(rssi_total, knn);	//predict bin, then clear values
 	xbee_11_rssi = 0;
 	xbee_12_rssi = 0;
 	xbee_13_rssi = 0;
 	xbee_14_rssi = 0;
-	console.log(bin_predicted);
-	if (bin_predicted in binmap) {	// only update website if prediction is valid
-	    var location = binmap[bin_predicted];
-	    console.log(location);
-	    io.emit('data',{x:location[0], y:location[1]});
+	console.log(binPredicted);
+	if (binPredicted in binmap) {	// if prediction is valid
+	    var location = binmap[binPredicted];
+//	    console.log(Math.abs(binPredicted-lastPrediction)*crawlerSpeed);
+//	    var now = moment();
+//	    console.log(moment().diff(lastPrediction));
+//	    if (lastPredTime!=0 && ( Math.abs(binPredicted-lastPrediction)*crawlerSpeed < now.diff(lastPredTime) )) { // not very first prediction, teleport check
+		io.emit('data',{x:location[0], y:location[1]}); //send data to website
+//		console.log("sent data");
+//	    }
+	    lastPredTime = moment();
+	    lastPrediction = binPredicted;
 	}
     }
 }
