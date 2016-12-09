@@ -21,6 +21,7 @@ body { padding-top: 50px; }
     height: 530px;
     margin:auto;
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 #plot {
@@ -31,7 +32,7 @@ body { padding-top: 50px; }
 }
 
 #controls {
-	padding: 50px 50px 50px 50px;
+	padding: 0px 50px 50px 50px;
 }
 
 #left{float:left; padding-left:120px;}

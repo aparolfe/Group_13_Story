@@ -91,9 +91,9 @@ XBeeAPI.on("frame_object", function(frame) {
     }
 });
 /*
-arduinoSerial.on("open", function () {
-    console.log('arduino serial open');
-}); */
+  arduinoSerial.on("open", function () {
+  console.log('arduino serial open');
+  }); */
 
 // Knn Logic
 
@@ -115,7 +115,7 @@ var knn = new ml.KNN({
 var binPredicted = 0;
 var lastPredTime = 0;
 var lastPrediction = 0;
-var crawlerSpeed = 3000; //units ms/bin
+var crawlerPace = 800; //units ms/bin (inverse of speed)
 function predict_and_send(){
     console.log(rssi_total);
     if (rssi_total.indexOf(0) == -1 && rssi_total.indexOf(255) == -1) { // if we have good data from all beacons
@@ -127,15 +127,14 @@ function predict_and_send(){
 	console.log(binPredicted);
 	if (binPredicted in binmap) {	// if prediction is valid
 	    var location = binmap[binPredicted];
-//	    console.log(Math.abs(binPredicted-lastPrediction)*crawlerSpeed);
-//	    var now = moment();
-//	    console.log(moment().diff(lastPrediction));
-//	    if (lastPredTime!=0 && ( Math.abs(binPredicted-lastPrediction)*crawlerSpeed < now.diff(lastPredTime) )) { // not very first prediction, teleport check
+	    var now = moment();
+	    console.log(moment().diff(lastPredTime));
+	    if (lastPredTime==0 || ( ((Math.abs(binPredicted-lastPrediction))%26)*crawlerPace < now.diff(lastPredTime) ) ) { // very first prediction or teleport check passes
 		io.emit('data',{x:location[0], y:location[1]}); //send data to website
-//		console.log("sent data");
-//	    }
-	    lastPredTime = moment();
-	    lastPrediction = binPredicted;
+		console.log("sent data");
+		lastPredTime = moment();
+		lastPrediction = binPredicted;
+	    }
 	}
     }
 }
@@ -147,7 +146,7 @@ io.on('connection', function(socket){
     socket.on('update',function(msg){
 	console.log(msg);
 	if ("01wadz".includes(msg)) {	// input validation
-//	    arduinoSerial.write(msg);
+	    //	    arduinoSerial.write(msg);
 	}
     });
 });
