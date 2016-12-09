@@ -1,4 +1,4 @@
-## Synopsis - Steering the Crawler
+## Synopsis - Autonomous Driving with Remote Monitoring and Control
 
 ![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112737.jpg)
 
