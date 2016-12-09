@@ -45,7 +45,7 @@ and to take over control of vehicle
 
 ##System Overview
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/systemoverview.png)
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/systemoverview.png)
 
 ## Setup and Demo
 
@@ -61,6 +61,8 @@ Configure the XBee by following the steps shown in [XBee setup guide and configu
 
 ### Webpage
 
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/screenshot.png)
+
 We have our own webpage that displays the following components:
 - Live Video Stream
 - Localisation
@@ -74,8 +76,9 @@ Our crawler:
 
 ![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112737.jpg)
 
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/crawler2.jpg)
 
-
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/crawler3.jpg)
 
 ## Contributors
 1. Aparna Rolfe
