@@ -1,4 +1,6 @@
-## Synopsis - Steering the Crawler
+## Synopsis - Autonomous Driving with Remote Monitoring and Control
+
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112737.jpg)
 
 Create a system that drives your vehicle through an indoor course without operator (human) control. The system should leverage control strategies for driving the collision avoidance (from ![challenge 4](https://github.com/aparolfe/Group_13_Story/tree/master/Ch04)) and indoor positioning (from ![challenge 6](https://github.com/aparolfe/Group_13_Story/tree/master/Ch06)).  Your solution should also provide a real time data stream (![challenge 3](https://github.com/aparolfe/Group_13_Story/tree/master/Ch03)) including position information that should be displayed on a remote computer console(![challenge 2](https://github.com/aparolfe/Group_13_Story/tree/master/Ch02)illustrating position information of your vehicle. Your systemshould also allow a human to take control remotely (![challenge 3](https://github.com/aparolfe/Group_13_Story/tree/master/Ch03)). 
 
@@ -45,7 +47,7 @@ and to take over control of vehicle
 
 ##System Overview
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/systemoverview.png)
+![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/systemoverview.png)
 
 ## Setup and Demo
 
@@ -61,6 +63,8 @@ Configure the XBee by following the steps shown in [XBee setup guide and configu
 
 ### Webpage
 
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/screenshot.png)
+
 We have our own webpage that displays the following components:
 - Live Video Stream
 - Localisation
@@ -71,11 +75,11 @@ We have our own webpage that displays the following components:
 We use a NodeJS server to render a HTML page. 
 
 Our crawler:
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/crawler1.jpg)
 
-![alt text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch05/static/IMG_20161101_112737.jpg)
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/crawler2.jpg)
 
-
-
+![alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/Ch08/static/crawler3.jpg)
 
 ## Contributors
 1. Aparna Rolfe
