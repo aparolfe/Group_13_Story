@@ -23,31 +23,17 @@ var options = {
     legend: 'none',
     backgroundColor: 'transparent',
     chartArea: {width: '100%', height: '100%'}
-};;
+};
 
-var pointCount =10; //number of points shown on the screen
-var colors = ['#f3e5f5', '#e1bee7','#ce93d8','#ba68c8','#ab47bc','#9c27b0','#8e24aa','#7b1fa2','#6a1b9a','#4a148c']; // light to dark
-var sizes = [1,2,3,4,5,6,7,8,9,10]; // small to big
-
-// given a new point, updates all 10 points and replots chart
+// given a new point, update chart
 function updateChart(x,y) {
-    // add new point, latest and hence boldest
-    var style = 'point { size:'+ sizes[pointCount] +'; fill-color:'+ colors[pointCount] +'; }' ;
+    // add new point
+    var style = 'point { size: 10; fill-color: #4a148c; }' ;
     var point=[ x , y , style ];
     data.addRow([ x, y, style ]);
-    var numPoints = data.getNumberOfRows();
     // if too many points, remove oldest one
-    if (numPoints > pointCount) {
-	data.removeRow(0);
-	numPoints = data.getNumberOfRows();
-    }
-    // shuffle colors
-    var jj =0;
-    for (var ii=pointCount-numPoints; ii < pointCount; ii++) {
-	style = 'point { size:'+ sizes[ii] +'; fill-color:'+ colors[ii] +'; }' ;
-	data.setCell(jj, 2, style);
-	jj++;
-    } 
+    var numPoints = data.getNumberOfRows();
+    if (numPoints > 1) data.removeRow(0);
     // redraw chart
     chart.draw(data, options);
 }
