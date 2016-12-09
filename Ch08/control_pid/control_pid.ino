@@ -37,8 +37,8 @@ int wheelNeutral = 115;      // neutral wheel position, in servo 'degrees'
 
 //ESC
 
-int maxSpeedOffset = 73; // maximum speed magnitude, in servo 'degrees'
-int minSpeedOffset = 77; // minimum speed magnitude, in servo 'degrees'
+int maxSpeedOffset = 70; // maximum speed magnitude, in servo 'degrees'
+int minSpeedOffset = 73; // minimum speed magnitude, in servo 'degrees'
 int minSpeedbackward = 95;
 int maxSpeedbackward =100;
 int minSpeedOffset_1;
@@ -50,7 +50,7 @@ double Input_servo, Output_servo;
 double Input_speed, Output_speed;
 double Setpoint = 98;
 
-int Kp_servo = 1.7;
+int Kp_servo = 1.3;
 int Ki_servo = 0.04;
 int Kd_servo = 0.5;
 int Kp_speed = 2;
@@ -220,26 +220,16 @@ void forward()
 {
   turn();
   turn_left_90_degree();
-  if (distance_from_obstacle_1 > 800){
-    distance_from_obstacle_1 = lidarGetDistance(LeftRangeSensor);
-    if (distance_from_obstacle_1 > 1000){
-    Serial.println("about to turn");
-    Serial.println("about to turn");
-    esc.write(ESC_STOP);    // abrupt stop
-    delay(500);
-    esc.write(105);
-    delay(2200);
-    turn_left_90_degree();
-    delay(5000);
+ 
   
     
-  }
-  }
+  
+  
   //speed up
 //  if (currentSpeedOffset > maxSpeedOffset) {
 //    currentSpeedOffset = currentSpeedOffset - linearAcc;
 //    esc.write(currentSpeedOffset);
-//  }
+// 
   esc.write(maxSpeedOffset);
   delay(30);
   Serial.println("forward Mode");
@@ -364,13 +354,13 @@ void loop()
 
   {
     myservo.write(wheelNeutral); 
+    
     while(safety_check >= 130){
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid foward collision");
     delay(2000);
     Serial.println("about to back");
     Serial.println("about to back");
-
     esc.write(105);
     delay(2000);
     esc.write(ESC_STOP);
@@ -379,12 +369,12 @@ void loop()
     delay(200);
     Serial.println("forward");
     
-    esc.write(minSpeedOffset -3);
+    esc.write(minSpeedOffset);
 
     }
     while (stop_start == 'z'){
     myservo.write(wheelNeutral); 
-    esc.write(100);  
+    esc.write(105);  
     Serial.println("backward");
     
     while(safety_check_2 >= IR_THRESHOLD){
@@ -394,7 +384,7 @@ void loop()
     Serial.println("about to fffback");
     Serial.println("about to fffback");
 
-    esc.write(80);
+    esc.write(76);
     delay(2000);
     esc.write(ESC_STOP);
     delay(2000);
@@ -415,7 +405,7 @@ void loop()
 
       while (stop_start == 'a')// && safety_check <= IR_THRESHOLD)
   {
-    esc.write(minSpeedOffset);
+    esc.write(minSpeedOffset+3);
     myservo.write(wheelNeutral + 40); 
     
    while(safety_check >= 130){
@@ -435,7 +425,7 @@ void loop()
    }
     while (stop_start == 'd')// && safety_check <= IR_THRESHOLD)
   {
-    esc.write(minSpeedOffset);
+    esc.write(minSpeedOffset+3);
     while(safety_check >= 130){
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid foward collision");
@@ -463,8 +453,10 @@ void loop()
 {   
     esc.write(ESC_STOP);    // abrupt stop
     Serial.println("Stopped to avoid imminent collision");
-    delay(2000);
- 
+    esc.write(105);    // abrupt stop
+    myservo.write(wheelNeutral-25); 
+    delay(3000);
+    break;
 }
 
 } // Main loop
