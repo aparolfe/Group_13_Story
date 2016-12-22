@@ -7,6 +7,8 @@ Please look at each folder for more details about each challenge and the instruc
 
 ## Contributors
 
+[!alt_text](https://github.com/aparolfe/Group_13_Story/blob/master/static/13.JPG)
+
 1. Aparna Rolfe
 2. Prerana Haridoss
 3. Mohammed Alabdemohsen
